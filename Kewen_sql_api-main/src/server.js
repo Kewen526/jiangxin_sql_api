@@ -14,6 +14,8 @@ import { registerSystemRoutes } from './routes/systemRoutes.js';
 import { registerAdminRoutes } from './routes/adminRoutes.js';
 import { registerExampleRoutes } from './routes/exampleRoutes.js';
 import routeReloader from './utils/routeReloader.js';
+import authRoutes from './routes/authRoutes.js';
+import { testConnection as testPlatformDb, closePlatformPool } from './auth/platformDb.js';
 
 // 加载环境变量
 dotenv.config();
@@ -80,30 +82,41 @@ async function start() {
     // 1. 注册插件
     await registerPlugins();
 
-    // 2. 初始化数据库连接池
-    await poolManager.initialize(process.env);
+    // 2. 测试平台数据库连接（认证系统）
+    console.log('🔌 连接平台数据库...');
+    const platformDbOk = await testPlatformDb();
+    if (!platformDbOk) {
+      console.warn('⚠️  平台数据库连接失败，认证功能将不可用');
+    }
 
-    // 3. 注册系统路由
+    // 3. 初始化业务数据库连接池（可选，用于租户数据源）
+    // await poolManager.initialize(process.env);
+
+    // 4. 注册认证路由
+    console.log('📝 注册认证路由...');
+    await fastify.register(authRoutes);
+
+    // 5. 注册系统路由
     console.log('📝 注册系统路由...');
     registerSystemRoutes(fastify);
 
-    // 4. 注册管理路由
+    // 6. 注册管理路由
     console.log('📝 注册管理路由...');
     registerAdminRoutes(fastify);
 
-    // 5. 注册示例代码路由
+    // 7. 注册示例代码路由
     console.log('📝 注册示例代码路由...');
     registerExampleRoutes(fastify);
 
-    // 6. 自动注册 API 路由
-    console.log('📝 注册 API 路由...');
-    await registerAutoRoutes(fastify, API_CONFIG_PATH);
+    // 8. 自动注册 API 路由（可选，从 JSON 或数据库加载）
+    // console.log('📝 注册 API 路由...');
+    // await registerAutoRoutes(fastify, API_CONFIG_PATH);
 
-    // 7. 初始化路由重载器
-    console.log('🔧 初始化路由重载器...');
-    routeReloader.initialize(fastify, API_CONFIG_PATH);
+    // 9. 初始化路由重载器（可选）
+    // console.log('🔧 初始化路由重载器...');
+    // routeReloader.initialize(fastify, API_CONFIG_PATH);
 
-    // 6. 启动 HTTP 服务器
+    // 10. 启动 HTTP 服务器
     await fastify.listen({ port: PORT, host: HOST });
 
     console.log('');
@@ -132,7 +145,10 @@ async function gracefulShutdown(signal) {
     await fastify.close();
     console.log('✅ HTTP 服务器已关闭');
 
-    // 2. 关闭数据库连接池
+    // 2. 关闭平台数据库连接池
+    await closePlatformPool();
+
+    // 3. 关闭业务数据库连接池
     await poolManager.closeAll();
 
     console.log('✅ 优雅关闭完成');
