@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>注册 - Jiangxin SQL API</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      width: 100%;
+      max-width: 420px;
+      padding: 40px;
+    }
+
+    .logo {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .logo h1 {
+      font-size: 28px;
+      color: #667eea;
+      margin-bottom: 10px;
+    }
+
+    .logo p {
+      color: #666;
+      font-size: 14px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      color: #333;
+      font-weight: 500;
+      font-size: 14px;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 12px 15px;
+      border: 2px solid #e0e0e0;
+      border-radius: 6px;
+      font-size: 14px;
+      transition: all 0.3s;
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .form-help {
+      font-size: 12px;
+      color: #999;
+      margin-top: 5px;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 14px;
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .btn:hover {
+      background: #5568d3;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .links {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 14px;
+      color: #666;
+    }
+
+    .links a {
+      color: #667eea;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .links a:hover {
+      text-decoration: underline;
+    }
+
+    .alert {
+      padding: 12px 15px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+
+    .alert-success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    .alert-error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo">
+      <h1>🚀 注册账号</h1>
+      <p>Jiangxin SQL API Platform</p>
+    </div>
+
+    <div id="alertBox" class="hidden"></div>
+
+    <form id="registerForm">
+      <div class="form-group">
+        <label for="company">公司/团队名称</label>
+        <input
+          type="text"
+          id="company"
+          name="company"
+          placeholder="请输入公司或团队名称"
+          required
+          minlength="2"
+          autocomplete="organization"
+        >
+        <div class="form-help">注册后将自动创建租户</div>
+      </div>
+
+      <div class="form-group">
+        <label for="email">邮箱</label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          placeholder="请输入邮箱"
+          required
+          autocomplete="email"
+        >
+        <div class="form-help">用于登录账号</div>
+      </div>
+
+      <div class="form-group">
+        <label for="password">密码</label>
+        <input
+          type="password"
+          id="password"
+          name="password"
+          placeholder="请输入密码"
+          required
+          minlength="6"
+          autocomplete="new-password"
+        >
+        <div class="form-help">至少6个字符</div>
+      </div>
+
+      <div class="form-group">
+        <label for="confirmPassword">确认密码</label>
+        <input
+          type="password"
+          id="confirmPassword"
+          name="confirmPassword"
+          placeholder="请再次输入密码"
+          required
+          minlength="6"
+          autocomplete="new-password"
+        >
+      </div>
+
+      <button type="submit" class="btn" id="submitBtn">注册</button>
+    </form>
+
+    <div class="links">
+      已有账号？<a href="login.html">立即登录</a>
+    </div>
+  </div>
+
+  <script>
+    // 配置API地址（根据实际部署修改）
+    const API_BASE_URL = window.location.origin;
+
+    const registerForm = document.getElementById('registerForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const alertBox = document.getElementById('alertBox');
+
+    // 显示提示信息
+    function showAlert(message, type = 'error') {
+      alertBox.className = `alert alert-${type}`;
+      alertBox.textContent = message;
+      alertBox.classList.remove('hidden');
+
+      setTimeout(() => {
+        alertBox.classList.add('hidden');
+      }, 5000);
+    }
+
+    // 注册表单提交
+    registerForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const company = document.getElementById('company').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+
+      // 验证
+      if (!company || !email || !password) {
+        showAlert('请填写完整信息');
+        return;
+      }
+
+      if (company.length < 2) {
+        showAlert('公司名称至少2个字符');
+        return;
+      }
+
+      if (password.length < 6) {
+        showAlert('密码至少6个字符');
+        return;
+      }
+
+      if (password !== confirmPassword) {
+        showAlert('两次密码输入不一致');
+        return;
+      }
+
+      // 禁用按钮
+      submitBtn.disabled = true;
+      submitBtn.textContent = '注册中...';
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ company, email, password })
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          // 保存 Token
+          localStorage.setItem('auth_token', result.data.token);
+          localStorage.setItem('user_info', JSON.stringify(result.data.user));
+
+          showAlert('注册成功！正在跳转...', 'success');
+
+          // 2秒后跳转
+          setTimeout(() => {
+            window.location.href = 'admin.html';
+          }, 1000);
+
+        } else {
+          showAlert(result.message || '注册失败');
+        }
+
+      } catch (error) {
+        console.error('注册请求失败:', error);
+        showAlert('网络错误，请稍后重试');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = '注册';
+      }
+    });
+  </script>
+</body>
+</html>

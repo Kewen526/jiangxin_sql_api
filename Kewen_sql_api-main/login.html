@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>登录 - Jiangxin SQL API</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      width: 100%;
+      max-width: 420px;
+      padding: 40px;
+    }
+
+    .logo {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .logo h1 {
+      font-size: 28px;
+      color: #667eea;
+      margin-bottom: 10px;
+    }
+
+    .logo p {
+      color: #666;
+      font-size: 14px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      color: #333;
+      font-weight: 500;
+      font-size: 14px;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 12px 15px;
+      border: 2px solid #e0e0e0;
+      border-radius: 6px;
+      font-size: 14px;
+      transition: all 0.3s;
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .btn {
+      width: 100%;
+      padding: 14px;
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .btn:hover {
+      background: #5568d3;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .links {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 14px;
+      color: #666;
+    }
+
+    .links a {
+      color: #667eea;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .links a:hover {
+      text-decoration: underline;
+    }
+
+    .alert {
+      padding: 12px 15px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+
+    .alert-success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    .alert-error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo">
+      <h1>🔐 用户登录</h1>
+      <p>Jiangxin SQL API Platform</p>
+    </div>
+
+    <div id="alertBox" class="hidden"></div>
+
+    <form id="loginForm">
+      <div class="form-group">
+        <label for="email">邮箱</label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          placeholder="请输入邮箱"
+          required
+          autocomplete="email"
+        >
+      </div>
+
+      <div class="form-group">
+        <label for="password">密码</label>
+        <input
+          type="password"
+          id="password"
+          name="password"
+          placeholder="请输入密码"
+          required
+          minlength="6"
+          autocomplete="current-password"
+        >
+      </div>
+
+      <button type="submit" class="btn" id="submitBtn">登录</button>
+    </form>
+
+    <div class="links">
+      还没有账号？<a href="register.html">立即注册</a>
+    </div>
+  </div>
+
+  <script>
+    // 配置API地址（根据实际部署修改）
+    const API_BASE_URL = window.location.origin;
+
+    const loginForm = document.getElementById('loginForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const alertBox = document.getElementById('alertBox');
+
+    // 显示提示信息
+    function showAlert(message, type = 'error') {
+      alertBox.className = `alert alert-${type}`;
+      alertBox.textContent = message;
+      alertBox.classList.remove('hidden');
+
+      setTimeout(() => {
+        alertBox.classList.add('hidden');
+      }, 5000);
+    }
+
+    // 登录表单提交
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+
+      if (!email || !password) {
+        showAlert('请填写完整信息');
+        return;
+      }
+
+      // 禁用按钮
+      submitBtn.disabled = true;
+      submitBtn.textContent = '登录中...';
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ email, password })
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          // 保存 Token
+          localStorage.setItem('auth_token', result.data.token);
+          localStorage.setItem('user_info', JSON.stringify(result.data.user));
+
+          showAlert('登录成功！正在跳转...', 'success');
+
+          // 3秒后跳转（可以修改为您的实际页面）
+          setTimeout(() => {
+            window.location.href = 'admin.html';
+          }, 1000);
+
+        } else {
+          showAlert(result.message || '登录失败');
+        }
+
+      } catch (error) {
+        console.error('登录请求失败:', error);
+        showAlert('网络错误，请稍后重试');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = '登录';
+      }
+    });
+
+    // 检查是否已登录
+    window.addEventListener('load', () => {
+      const token = localStorage.getItem('auth_token');
+      if (token) {
+        // 已登录，可选择跳转
+        // window.location.href = 'admin.html';
+      }
+    });
+  </script>
+</body>
+</html>
