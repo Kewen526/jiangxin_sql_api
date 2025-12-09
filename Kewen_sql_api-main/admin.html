@@ -375,6 +375,91 @@
       resize: vertical;
     }
 
+    .form-checkbox {
+      margin-right: 8px;
+    }
+
+    /* ===== SQL标签页样式 ===== */
+    .sql-tabs-container {
+      margin-bottom: 15px;
+    }
+
+    .sql-tabs-header {
+      display: flex;
+      gap: 5px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+
+    .sql-tab {
+      padding: 6px 12px;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+
+    .sql-tab:hover {
+      background: var(--bg-hover);
+      color: var(--text-primary);
+    }
+
+    .sql-tab.active {
+      background: var(--accent-blue);
+      color: white;
+      border-color: var(--accent-blue);
+    }
+
+    .sql-tab-close {
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      opacity: 0.7;
+    }
+
+    .sql-tab-close:hover {
+      opacity: 1;
+    }
+
+    .sql-tab-add {
+      padding: 6px 12px;
+      background: transparent;
+      border: 1px dashed var(--border-color);
+      border-radius: 4px;
+      color: var(--accent-light);
+      cursor: pointer;
+      font-size: 12px;
+      transition: all 0.2s;
+    }
+
+    .sql-tab-add:hover {
+      border-color: var(--accent-blue);
+      background: var(--bg-hover);
+    }
+
+    .sql-tab-content {
+      display: none;
+    }
+
+    .sql-tab-content.active {
+      display: block;
+    }
+
+    .sql-info {
+      font-size: 11px;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+      padding: 5px;
+      background: var(--bg-tertiary);
+      border-radius: 3px;
+    }
+
     /* ===== 按钮样式 ===== */
     .btn {
       padding: 8px 16px;
@@ -425,10 +510,134 @@
       background: var(--bg-hover);
     }
 
+    .btn-sm {
+      padding: 5px 10px;
+      font-size: 12px;
+    }
+
     .btn-group {
       display: flex;
       gap: 10px;
       margin-top: 20px;
+    }
+
+    /* ===== Modal样式 ===== */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      max-width: 800px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: var(--shadow);
+    }
+
+    .modal-header {
+      padding: 20px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-title {
+      font-size: 18px;
+      color: var(--text-primary);
+    }
+
+    .modal-close {
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      font-size: 24px;
+      cursor: pointer;
+      padding: 0;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 4px;
+    }
+
+    .modal-close:hover {
+      background: var(--bg-hover);
+      color: var(--text-primary);
+    }
+
+    .modal-body {
+      padding: 20px;
+    }
+
+    .modal-footer {
+      padding: 15px 20px;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    /* ===== 表格样式 ===== */
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    .table th,
+    .table td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--border-color);
+      font-size: 13px;
+    }
+
+    .table th {
+      background: var(--bg-tertiary);
+      color: var(--text-secondary);
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 11px;
+      letter-spacing: 0.5px;
+    }
+
+    .table td {
+      color: var(--text-primary);
+    }
+
+    .table tr:hover {
+      background: var(--bg-hover);
+    }
+
+    .table .actions {
+      display: flex;
+      gap: 5px;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px;
+      color: var(--text-secondary);
+      font-size: 14px;
     }
 
     /* ===== 滚动条样式 ===== */
@@ -460,21 +669,18 @@
       font-size: 12px;
       overflow-x: auto;
       margin: 10px 0;
+      white-space: pre-wrap;
+      word-wrap: break-word;
     }
 
-    /* ===== 加载动画 ===== */
-    .loading {
-      display: inline-block;
-      width: 16px;
-      height: 16px;
-      border: 2px solid var(--border-color);
-      border-top-color: var(--accent-blue);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
+    /* ===== 结果容器样式 ===== */
+    .result-container {
+      display: none;
+      margin-top: 20px;
     }
 
-    @keyframes spin {
-      to { transform: rotate(360deg); }
+    .result-container.active {
+      display: block;
     }
 
     /* ===== 搜索框 ===== */
@@ -551,7 +757,7 @@
       <!-- 搜索框 -->
       <div class="search-box">
         <span class="search-icon">🔍</span>
-        <input type="text" class="search-input" placeholder="搜索API..." id="searchInput" oninput="filterAPIs()">
+        <input type="text" class="search-input" placeholder="搜索API..." id="searchInput">
       </div>
 
       <!-- 树形菜单 -->
@@ -569,12 +775,15 @@
         <p class="welcome-subtitle">从左侧选择一个API开始编辑，或创建新的API</p>
         <div class="btn-group">
           <button class="btn btn-primary" onclick="createNewAPI()">创建新API</button>
-          <button class="btn btn-secondary" onclick="loadAPIs()">刷新列表</button>
+          <button class="btn btn-secondary" onclick="refreshData()">刷新列表</button>
         </div>
       </div>
 
       <!-- API详情面板 -->
       <div class="detail-panel" id="detailPanel">
+        <!-- 隐藏的ID字段 -->
+        <input type="hidden" id="apiId">
+
         <div class="detail-header">
           <h2 class="detail-title" id="detailTitle">API名称</h2>
           <p class="detail-path" id="detailPath">/api/path</p>
@@ -591,11 +800,11 @@
           <!-- 基本信息 Tab -->
           <div class="tab-pane active" id="tab-basic">
             <div class="form-group">
-              <label class="form-label">API名称</label>
+              <label class="form-label">API名称 *</label>
               <input type="text" class="form-input" id="apiName" placeholder="输入API名称">
             </div>
             <div class="form-group">
-              <label class="form-label">请求路径</label>
+              <label class="form-label">请求路径 *</label>
               <input type="text" class="form-input" id="apiPath" placeholder="/api/your-endpoint">
             </div>
             <div class="form-group">
@@ -603,14 +812,28 @@
               <textarea class="form-textarea" id="apiNote" placeholder="API说明"></textarea>
             </div>
             <div class="form-group">
-              <label class="form-label">所属分组</label>
+              <label class="form-label">所属分组 *</label>
               <select class="form-select" id="apiGroup">
-                <option value="">无分组</option>
+                <option value="">选择分组</option>
               </select>
             </div>
+            <div class="form-group">
+              <label class="form-label">返回类型</label>
+              <select class="form-select" id="apiContentType">
+                <option value="application/json">JSON (application/json)</option>
+                <option value="text/plain">文本 (text/plain)</option>
+                <option value="text/html">HTML (text/html)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">
+                <input type="checkbox" class="form-checkbox" id="apiTransaction">
+                启用事务（多条SQL将在同一个事务中执行）
+              </label>
+            </div>
             <div class="btn-group">
-              <button class="btn btn-success" onclick="saveAPI()">保存</button>
-              <button class="btn btn-danger" onclick="deleteAPI()">删除</button>
+              <button class="btn btn-success" onclick="saveAPI()">💾 保存</button>
+              <button class="btn btn-danger" onclick="deleteCurrentAPI()">🗑️ 删除</button>
               <button class="btn btn-secondary" onclick="closeDetail()">关闭</button>
             </div>
           </div>
@@ -618,38 +841,188 @@
           <!-- SQL配置 Tab -->
           <div class="tab-pane" id="tab-sql">
             <div class="form-group">
-              <label class="form-label">数据源</label>
+              <label class="form-label">数据源 *</label>
               <select class="form-select" id="apiDatasource">
                 <option value="">选择数据源</option>
               </select>
             </div>
-            <div class="form-group">
-              <label class="form-label">SQL语句</label>
-              <textarea class="form-textarea" id="apiSQL" placeholder="SELECT * FROM table WHERE id = #{id}" style="min-height: 300px;"></textarea>
+
+            <!-- SQL多标签页 -->
+            <div class="sql-tabs-container">
+              <label class="form-label">SQL语句 *</label>
+              <div class="sql-tabs-header" id="sqlTabsHeader">
+                <!-- 动态生成SQL标签 -->
+              </div>
+              <div id="sqlTabsContent">
+                <!-- 动态生成SQL内容 -->
+              </div>
             </div>
           </div>
 
           <!-- 参数 Tab -->
           <div class="tab-pane" id="tab-params">
             <div class="form-group">
-              <label class="form-label">参数列表</label>
-              <div class="code-block">参数配置开发中...</div>
+              <label class="form-label">参数定义</label>
+              <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 10px;">
+                每行一个参数，格式：参数名:类型:说明<br>
+                例如：id:string:用户ID
+              </p>
+              <textarea class="form-textarea" id="apiParams" placeholder="id:string:用户ID&#10;name:string:用户名称" style="min-height: 200px;"></textarea>
             </div>
           </div>
 
           <!-- 测试 Tab -->
           <div class="tab-pane" id="tab-test">
             <div class="form-group">
-              <label class="form-label">测试参数（JSON）</label>
-              <textarea class="form-textarea" id="testParams" placeholder='{"id": 1}' style="min-height: 150px;"></textarea>
+              <label class="form-label">测试参数（JSON格式）</label>
+              <textarea class="form-textarea" id="apiTestParams" placeholder='{"id": "1", "name": "test"}' style="min-height: 150px;"></textarea>
             </div>
-            <button class="btn btn-primary" onclick="testAPI()">执行测试</button>
-            <div class="form-group" style="margin-top: 20px;">
-              <label class="form-label">测试结果</label>
-              <div class="code-block" id="testResult" style="min-height: 200px;">点击"执行测试"查看结果</div>
+            <button class="btn btn-primary" onclick="testExecuteApi()">▶️ 执行测试</button>
+
+            <div class="result-container" id="testResultContainer">
+              <div class="form-group" style="margin-top: 20px;">
+                <label class="form-label">测试结果</label>
+                <div class="code-block" id="testResult"></div>
+              </div>
             </div>
           </div>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 数据源管理Modal -->
+  <div class="modal" id="datasourceManagementModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">数据源管理</h3>
+        <button class="modal-close" onclick="closeDatasourceManagementModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <button class="btn btn-primary btn-sm" onclick="openAddDatasourceModal()">+ 添加数据源</button>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>名称</th>
+              <th>主机</th>
+              <th>端口</th>
+              <th>数据库</th>
+              <th>创建时间</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="datasourceTableBody">
+            <tr><td colspan="6" class="empty-state">加载中...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- 数据源编辑Modal -->
+  <div class="modal" id="datasourceModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title" id="datasourceModalTitle">添加数据源</h3>
+        <button class="modal-close" onclick="closeDatasourceModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="dsId">
+        <div class="form-group">
+          <label class="form-label">名称 *</label>
+          <input type="text" class="form-input" id="dsName" placeholder="数据源名称">
+        </div>
+        <div class="form-group">
+          <label class="form-label">主机 *</label>
+          <input type="text" class="form-input" id="dsHost" placeholder="localhost 或 IP地址">
+        </div>
+        <div class="form-group">
+          <label class="form-label">端口 *</label>
+          <input type="number" class="form-input" id="dsPort" value="3306">
+        </div>
+        <div class="form-group">
+          <label class="form-label">用户名 *</label>
+          <input type="text" class="form-input" id="dsUser" placeholder="数据库用户名">
+        </div>
+        <div class="form-group">
+          <label class="form-label">密码 *</label>
+          <input type="password" class="form-input" id="dsPassword" placeholder="数据库密码">
+        </div>
+        <div class="form-group">
+          <label class="form-label">数据库 *</label>
+          <input type="text" class="form-input" id="dsDatabase" placeholder="数据库名称">
+        </div>
+        <div class="form-group">
+          <label class="form-label">最小连接数</label>
+          <input type="number" class="form-input" id="dsPoolMin" value="2">
+        </div>
+        <div class="form-group">
+          <label class="form-label">最大连接数</label>
+          <input type="number" class="form-input" id="dsPoolMax" value="10">
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="testDatasourceConnection()">🔌 测试连接</button>
+        <div class="result-container" id="dsTestResultContainer">
+          <div class="code-block"><pre></pre></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-success" onclick="saveDatasource()">保存</button>
+        <button class="btn btn-secondary" onclick="closeDatasourceModal()">取消</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 分组管理Modal -->
+  <div class="modal" id="groupManagementModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">分组管理</h3>
+        <button class="modal-close" onclick="closeGroupManagementModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <button class="btn btn-primary btn-sm" onclick="openAddGroupModal()">+ 添加分组</button>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>名称</th>
+              <th>说明</th>
+              <th>排序</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="groupTableBody">
+            <tr><td colspan="4" class="empty-state">加载中...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- 分组编辑Modal -->
+  <div class="modal" id="groupModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title" id="groupModalTitle">添加分组</h3>
+        <button class="modal-close" onclick="closeGroupModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="groupId">
+        <div class="form-group">
+          <label class="form-label">分组名称 *</label>
+          <input type="text" class="form-input" id="groupName" placeholder="分组名称">
+        </div>
+        <div class="form-group">
+          <label class="form-label">说明</label>
+          <input type="text" class="form-input" id="groupDescription" placeholder="分组说明">
+        </div>
+        <div class="form-group">
+          <label class="form-label">排序</label>
+          <input type="number" class="form-input" id="groupOrder" value="1">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-success" onclick="saveGroup()">保存</button>
+        <button class="btn btn-secondary" onclick="closeGroupModal()">取消</button>
       </div>
     </div>
   </div>
@@ -661,13 +1034,65 @@
     let groups = [];
     let datasources = [];
     let currentAPI = null;
+    let currentSqlTabs = [];
+    let activeSqlTabIndex = 0;
 
     // 页面加载时初始化
-    window.addEventListener('DOMContentLoaded', () => {
-      loadAPIs();
-      loadGroups();
-      loadDatasources();
+    window.addEventListener('DOMContentLoaded', async () => {
+      await loadMetadata();
+      await loadAPIs();
     });
+
+    // 加载元数据（分组和数据源）
+    async function loadMetadata() {
+      try {
+        const [groupsRes, datasourcesRes] = await Promise.all([
+          fetch(`${API_BASE}/admin/groups`),
+          fetch(`${API_BASE}/admin/datasources`)
+        ]);
+
+        const groupsData = await groupsRes.json();
+        const datasourcesData = await datasourcesRes.json();
+
+        if (groupsData.success) {
+          groups = groupsData.data || groupsData.groups || [];
+          populateGroupSelect();
+        }
+
+        if (datasourcesData.success) {
+          datasources = datasourcesData.data || [];
+          populateDatasourceSelect();
+        }
+
+        updateStats();
+      } catch (error) {
+        console.error('加载元数据失败:', error);
+      }
+    }
+
+    // 填充分组下拉框
+    function populateGroupSelect() {
+      const select = document.getElementById('apiGroup');
+      select.innerHTML = '<option value="">选择分组</option>';
+      groups.forEach(group => {
+        const option = document.createElement('option');
+        option.value = group.id;
+        option.textContent = group.name;
+        select.appendChild(option);
+      });
+    }
+
+    // 填充数据源下拉框
+    function populateDatasourceSelect() {
+      const select = document.getElementById('apiDatasource');
+      select.innerHTML = '<option value="">选择数据源</option>';
+      datasources.forEach(ds => {
+        const option = document.createElement('option');
+        option.value = ds.id;
+        option.textContent = ds.name;
+        select.appendChild(option);
+      });
+    }
 
     // 加载所有API
     async function loadAPIs() {
@@ -676,7 +1101,7 @@
         const data = await response.json();
 
         if (data.success) {
-          allApis = data.apis || [];
+          allApis = data.data || data.apis || [];
           updateStats();
           renderAPITree();
         } else {
@@ -684,37 +1109,6 @@
         }
       } catch (error) {
         console.error('加载API失败:', error);
-      }
-    }
-
-    // 加载分组
-    async function loadGroups() {
-      try {
-        const response = await fetch(`${API_BASE}/admin/groups`);
-        const data = await response.json();
-
-        if (data.success) {
-          groups = data.groups || [];
-          updateStats();
-          renderAPITree();
-        }
-      } catch (error) {
-        console.error('加载分组失败:', error);
-      }
-    }
-
-    // 加载数据源
-    async function loadDatasources() {
-      try {
-        const response = await fetch(`${API_BASE}/admin/datasources`);
-        const data = await response.json();
-
-        if (data.success) {
-          datasources = data.data || [];
-          updateStats();
-        }
-      } catch (error) {
-        console.error('加载数据源失败:', error);
       }
     }
 
@@ -728,12 +1122,23 @@
     // 渲染API树
     function renderAPITree() {
       const treeContainer = document.getElementById('apiTree');
+      const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+
+      // 过滤API
+      let filteredApis = allApis;
+      if (searchTerm) {
+        filteredApis = allApis.filter(api =>
+          api.name.toLowerCase().includes(searchTerm) ||
+          api.path.toLowerCase().includes(searchTerm) ||
+          (api.note && api.note.toLowerCase().includes(searchTerm))
+        );
+      }
 
       // 按分组分类API
       const groupedAPIs = {};
       const ungroupedAPIs = [];
 
-      allApis.forEach(api => {
+      filteredApis.forEach(api => {
         if (api.groupId) {
           if (!groupedAPIs[api.groupId]) {
             groupedAPIs[api.groupId] = [];
@@ -749,6 +1154,8 @@
       // 渲染分组
       groups.forEach(group => {
         const groupAPIs = groupedAPIs[group.id] || [];
+        if (searchTerm && groupAPIs.length === 0) return; // 搜索时隐藏空分组
+
         html += `
           <div class="tree-group">
             <div class="group-header" onclick="toggleGroup('${group.id}')">
@@ -784,9 +1191,10 @@
 
     // 渲染单个API项
     function renderAPIItem(api) {
-      const method = (api.contentType || 'POST').toUpperCase();
+      const method = 'POST';
+      const isActive = currentAPI && currentAPI.id === api.id ? 'active' : '';
       return `
-        <div class="api-item" onclick="selectAPI('${api.id}')">
+        <div class="api-item ${isActive}" onclick="selectAPI('${api.id}')">
           <span class="api-method ${method.toLowerCase()}">${method}</span>
           <span>${api.name}</span>
         </div>
@@ -796,6 +1204,8 @@
     // 切换分组展开/折叠
     function toggleGroup(groupId) {
       const groupElement = document.getElementById(`group-${groupId}`);
+      if (!groupElement) return;
+
       const header = groupElement.previousElementSibling;
 
       if (groupElement.classList.contains('expanded')) {
@@ -823,35 +1233,143 @@
       });
     }
 
+    // 搜索输入事件
+    document.getElementById('searchInput').addEventListener('input', () => {
+      renderAPITree();
+    });
+
     // 选择API
-    function selectAPI(apiId) {
-      currentAPI = allApis.find(api => api.id === apiId);
+    async function selectAPI(apiId) {
+      try {
+        const response = await fetch(`${API_BASE}/admin/apis/${apiId}`);
+        if (!response.ok) throw new Error('加载失败');
 
-      if (!currentAPI) return;
+        const data = await response.json();
+        currentAPI = data.api || data.data;
 
-      // 更新选中状态
-      document.querySelectorAll('.api-item').forEach(item => {
-        item.classList.remove('active');
-      });
-      event.currentTarget.classList.add('active');
+        // 更新选中状态
+        document.querySelectorAll('.api-item').forEach(item => {
+          item.classList.remove('active');
+        });
+        event.currentTarget.classList.add('active');
 
-      // 显示详情面板
-      document.getElementById('welcomeScreen').style.display = 'none';
-      document.getElementById('detailPanel').classList.add('active');
+        // 显示详情面板
+        document.getElementById('welcomeScreen').style.display = 'none';
+        document.getElementById('detailPanel').classList.add('active');
 
-      // 填充表单
-      document.getElementById('detailTitle').textContent = currentAPI.name;
-      document.getElementById('detailPath').textContent = currentAPI.path;
-      document.getElementById('apiName').value = currentAPI.name || '';
-      document.getElementById('apiPath').value = currentAPI.path || '';
-      document.getElementById('apiNote').value = currentAPI.note || '';
-      document.getElementById('apiGroup').value = currentAPI.groupId || '';
-
-      // SQL配置
-      if (currentAPI.sqlConfig) {
+        // 填充表单
+        document.getElementById('apiId').value = currentAPI.id;
+        document.getElementById('detailTitle').textContent = currentAPI.name;
+        document.getElementById('detailPath').textContent = currentAPI.path;
+        document.getElementById('apiName').value = currentAPI.name || '';
+        document.getElementById('apiPath').value = currentAPI.path || '';
+        document.getElementById('apiNote').value = currentAPI.note || '';
+        document.getElementById('apiGroup').value = currentAPI.groupId || '';
         document.getElementById('apiDatasource').value = currentAPI.datasourceId || '';
-        document.getElementById('apiSQL').value = currentAPI.sqlList?.[0] || '';
+        document.getElementById('apiContentType').value = currentAPI.contentType || 'application/json';
+        document.getElementById('apiTransaction').checked = currentAPI.transaction === 1;
+
+        // 加载SQL标签
+        currentSqlTabs = currentAPI.sqlList && currentAPI.sqlList.length > 0 ? currentAPI.sqlList : [{
+          id: generateId(),
+          sqlText: ''
+        }];
+        activeSqlTabIndex = 0;
+        renderSqlTabs();
+
+        // 加载参数
+        if (currentAPI.params && currentAPI.params.length > 0) {
+          const paramsText = currentAPI.params.map(p =>
+            `${p.name}:${p.type}:${p.note || ''}`
+          ).join('\n');
+          document.getElementById('apiParams').value = paramsText;
+        } else {
+          document.getElementById('apiParams').value = '';
+        }
+
+        // 加载测试参数
+        if (currentAPI.testParams && Object.keys(currentAPI.testParams).length > 0) {
+          document.getElementById('apiTestParams').value = JSON.stringify(currentAPI.testParams, null, 2);
+        } else {
+          document.getElementById('apiTestParams').value = '';
+        }
+
+        // 隐藏测试结果
+        document.getElementById('testResultContainer').classList.remove('active');
+
+      } catch (error) {
+        alert('加载 API 失败: ' + error.message);
       }
+    }
+
+    // 渲染SQL标签页
+    function renderSqlTabs() {
+      const header = document.getElementById('sqlTabsHeader');
+      const content = document.getElementById('sqlTabsContent');
+
+      // 渲染标签头
+      header.innerHTML = `
+        ${currentSqlTabs.map((sql, index) => `
+          <button type="button" class="sql-tab ${index === activeSqlTabIndex ? 'active' : ''}"
+                  onclick="switchSqlTab(${index})">
+            SQL-${index + 1}
+            ${currentSqlTabs.length > 1 ? `<span class="sql-tab-close" onclick="event.stopPropagation(); deleteSqlTab(${index})">&times;</span>` : ''}
+          </button>
+        `).join('')}
+        <button type="button" class="sql-tab-add" onclick="addSqlTab()">+ 新增 SQL</button>
+      `;
+
+      // 渲染标签内容
+      content.innerHTML = currentSqlTabs.map((sql, index) => `
+        <div class="sql-tab-content ${index === activeSqlTabIndex ? 'active' : ''}" id="sqlContent${index}">
+          <div class="sql-info">
+            SQL ID: ${sql.id || '新建'} | 标签 ${index + 1}
+          </div>
+          <textarea class="form-textarea" rows="12"
+                    style="width: 100%; min-height: 300px;"
+                    placeholder="输入 SQL 查询语句，支持 MyBatis 参数：#{param}"
+                    onchange="updateSqlText(${index}, this.value)">${sql.sqlText || ''}</textarea>
+        </div>
+      `).join('');
+    }
+
+    // 切换SQL标签
+    function switchSqlTab(index) {
+      activeSqlTabIndex = index;
+      renderSqlTabs();
+    }
+
+    // 添加SQL标签
+    function addSqlTab() {
+      currentSqlTabs.push({
+        id: generateId(),
+        sqlText: ''
+      });
+      activeSqlTabIndex = currentSqlTabs.length - 1;
+      renderSqlTabs();
+    }
+
+    // 删除SQL标签
+    function deleteSqlTab(index) {
+      if (currentSqlTabs.length <= 1) {
+        alert('至少需要保留一个 SQL！');
+        return;
+      }
+
+      if (!confirm(`确定要删除 SQL-${index + 1} 吗？`)) {
+        return;
+      }
+
+      currentSqlTabs.splice(index, 1);
+      if (activeSqlTabIndex >= currentSqlTabs.length) {
+        activeSqlTabIndex = currentSqlTabs.length - 1;
+      }
+      renderSqlTabs();
+    }
+
+    // 更新SQL文本
+    function updateSqlText(index, text) {
+      currentSqlTabs[index].sqlText = text;
     }
 
     // 切换Tab
@@ -871,18 +1389,177 @@
 
     // 创建新API
     function createNewAPI() {
-      alert('创建API功能开发中...');
+      currentAPI = null;
+
+      // 清空表单
+      document.getElementById('apiId').value = '';
+      document.getElementById('apiName').value = '';
+      document.getElementById('apiPath').value = '';
+      document.getElementById('apiNote').value = '';
+      document.getElementById('apiGroup').value = '';
+      document.getElementById('apiDatasource').value = '';
+      document.getElementById('apiContentType').value = 'application/json';
+      document.getElementById('apiTransaction').checked = false;
+      document.getElementById('apiParams').value = '';
+      document.getElementById('apiTestParams').value = '';
+
+      // 初始化一个空的SQL标签
+      currentSqlTabs = [{
+        id: generateId(),
+        sqlText: ''
+      }];
+      activeSqlTabIndex = 0;
+      renderSqlTabs();
+
+      // 显示详情面板
+      document.getElementById('welcomeScreen').style.display = 'none';
+      document.getElementById('detailPanel').classList.add('active');
+      document.getElementById('detailTitle').textContent = '新建API';
+      document.getElementById('detailPath').textContent = '未保存';
+
+      // 清除选中状态
+      document.querySelectorAll('.api-item').forEach(item => {
+        item.classList.remove('active');
+      });
+
+      // 隐藏测试结果
+      document.getElementById('testResultContainer').classList.remove('active');
+
+      // 切换到基本信息Tab
+      document.querySelectorAll('.detail-tab').forEach(tab => tab.classList.remove('active'));
+      document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
+      document.querySelector('.detail-tab').classList.add('active');
+      document.getElementById('tab-basic').classList.add('active');
     }
 
     // 保存API
-    function saveAPI() {
-      alert('保存API功能开发中...');
+    async function saveAPI() {
+      const id = document.getElementById('apiId').value;
+      const name = document.getElementById('apiName').value.trim();
+      const path = document.getElementById('apiPath').value.trim();
+      const note = document.getElementById('apiNote').value.trim();
+      const groupId = document.getElementById('apiGroup').value;
+      const datasourceId = document.getElementById('apiDatasource').value;
+      const contentType = document.getElementById('apiContentType').value;
+      const isTransaction = document.getElementById('apiTransaction').checked;
+      const paramsText = document.getElementById('apiParams').value;
+      const testParamsText = document.getElementById('apiTestParams').value;
+
+      // 验证必填字段
+      if (!name || !path || !groupId || !datasourceId) {
+        alert('请填写所有必填字段（名称、路径、分组、数据源）');
+        return;
+      }
+
+      // 验证路径是否重复
+      const duplicateApi = allApis.find(api => api.path === path && api.id !== id);
+      if (duplicateApi) {
+        alert(`❌ 路径重复！\n\n路径 "${path}" 已被 API "${duplicateApi.name}" 使用。\n\n请使用其他路径。`);
+        return;
+      }
+
+      // 验证至少有一个SQL
+      if (currentSqlTabs.length === 0 || !currentSqlTabs[0].sqlText.trim()) {
+        alert('请至少填写一个 SQL 语句');
+        return;
+      }
+
+      // 解析参数
+      const params = paramsText.trim() ? paramsText.split('\n').map(line => {
+        const [name, type, note] = line.split(':').map(s => s.trim());
+        return { name, type, note: note || '' };
+      }) : [];
+
+      // 解析测试参数
+      let testParams = {};
+      if (testParamsText.trim()) {
+        try {
+          testParams = JSON.parse(testParamsText);
+        } catch (e) {
+          alert('❌ 测试参数 JSON 格式错误: ' + e.message);
+          return;
+        }
+      }
+
+      const apiData = {
+        name,
+        path,
+        note,
+        groupId,
+        datasourceId,
+        contentType,
+        transaction: isTransaction ? 1 : 0,
+        params,
+        testParams,
+        sqlList: currentSqlTabs.map(tab => ({
+          id: tab.id,
+          sqlText: tab.sqlText
+        }))
+      };
+
+      try {
+        const url = id ? `${API_BASE}/admin/apis/${id}` : `${API_BASE}/admin/apis`;
+        const method = id ? 'PUT' : 'POST';
+
+        const response = await fetch(url, {
+          method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(apiData)
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.message || error.error || '保存失败');
+        }
+
+        alert(id ? '✅ API 更新成功！' : '✅ API 创建成功！');
+        await loadAPIs();
+
+        // 如果是新建的，选中刚创建的API
+        if (!id) {
+          const result = await response.json();
+          if (result.data && result.data.id) {
+            // 等待树重新渲染
+            setTimeout(() => {
+              const apiItem = document.querySelector(`.api-item[onclick*="${result.data.id}"]`);
+              if (apiItem) apiItem.click();
+            }, 100);
+          }
+        }
+      } catch (error) {
+        alert('❌ 保存失败\n\n' + error.message);
+      }
     }
 
-    // 删除API
-    function deleteAPI() {
-      if (confirm('确定要删除此API吗？')) {
-        alert('删除API功能开发中...');
+    // 删除当前API
+    async function deleteCurrentAPI() {
+      const id = document.getElementById('apiId').value;
+      const name = document.getElementById('apiName').value;
+
+      if (!id) {
+        alert('请先选择要删除的API');
+        return;
+      }
+
+      if (!confirm(`确定要删除 API "${name}" 吗？\n\n此操作不可恢复！`)) {
+        return;
+      }
+
+      try {
+        const response = await fetch(`${API_BASE}/admin/apis/${id}`, {
+          method: 'DELETE'
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.error || '删除失败');
+        }
+
+        alert('✅ API 删除成功！');
+        closeDetail();
+        await loadAPIs();
+      } catch (error) {
+        alert('❌ 删除失败: ' + error.message);
       }
     }
 
@@ -893,35 +1570,546 @@
       document.querySelectorAll('.api-item').forEach(item => {
         item.classList.remove('active');
       });
+      currentAPI = null;
     }
 
-    // 测试API
-    function testAPI() {
-      alert('测试API功能开发中...');
+    // 测试执行API
+    async function testExecuteApi() {
+      const id = document.getElementById('apiId').value;
+      const testParamsText = document.getElementById('apiTestParams').value;
+      const datasourceId = document.getElementById('apiDatasource').value;
+      const isTransaction = document.getElementById('apiTransaction').checked;
+
+      // 验证必填字段
+      if (!datasourceId) {
+        alert('⚠️ 请先选择数据源');
+        return;
+      }
+
+      // 验证至少有一个SQL
+      if (currentSqlTabs.length === 0 || !currentSqlTabs[0].sqlText.trim()) {
+        alert('⚠️ 请至少填写一个 SQL 语句');
+        return;
+      }
+
+      // 解析测试参数
+      let testParams = {};
+      if (testParamsText.trim()) {
+        try {
+          testParams = JSON.parse(testParamsText);
+        } catch (e) {
+          alert('❌ 测试参数 JSON 格式错误: ' + e.message);
+          return;
+        }
+      }
+
+      // 显示加载状态
+      const resultContainer = document.getElementById('testResultContainer');
+      const resultElement = document.getElementById('testResult');
+
+      resultContainer.classList.add('active');
+      resultElement.textContent = '⏳ 正在执行测试...';
+      resultElement.style.color = '';
+
+      try {
+        let response, result;
+
+        if (id) {
+          // 编辑模式：使用已保存的API进行测试
+          response = await fetch(`${API_BASE}/admin/apis/${id}/test-execute`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ testParams })
+          });
+        } else {
+          // 新增模式：使用临时测试接口
+          response = await fetch(`${API_BASE}/admin/test-execute`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              datasourceId,
+              sqlList: currentSqlTabs.map(tab => ({
+                id: tab.id,
+                sqlText: tab.sqlText
+              })),
+              testParams,
+              transaction: isTransaction ? 1 : 0
+            })
+          });
+        }
+
+        result = await response.json();
+
+        if (response.ok && result.success) {
+          // 成功执行
+          resultElement.style.color = '#4caf50';
+          resultElement.textContent =
+            `✅ 测试执行成功！\n\n` +
+            `执行参数：\n${JSON.stringify(result.executedWith, null, 2)}\n\n` +
+            `返回结果：\n${JSON.stringify(result.data, null, 2)}`;
+        } else {
+          // 执行失败
+          resultElement.style.color = '#f44336';
+          resultElement.textContent =
+            `❌ 测试执行失败\n\n` +
+            `错误信息：${result.message}\n\n` +
+            (result.error ? `详细错误：\n${result.error}` : '');
+        }
+      } catch (error) {
+        resultElement.style.color = '#f44336';
+        resultElement.textContent =
+          `❌ 请求失败\n\n` +
+          `错误信息：${error.message}\n\n` +
+          `请检查：\n` +
+          `1. 服务器是否正常运行\n` +
+          `2. 网络连接是否正常\n` +
+          `3. SQL语句是否正确`;
+      }
     }
 
-    // 管理数据源
-    function manageDatasources() {
-      alert('数据源管理功能开发中...');
+    // ========== 数据源管理功能 ==========
+
+    // 打开数据源管理Modal
+    async function manageDatasources() {
+      try {
+        await loadDatasourcesList();
+        document.getElementById('datasourceManagementModal').classList.add('active');
+      } catch (error) {
+        alert('❌ 加载数据源列表失败: ' + error.message);
+      }
     }
 
-    // 管理分组
-    function manageGroups() {
-      alert('分组管理功能开发中...');
+    // 关闭数据源管理Modal
+    function closeDatasourceManagementModal() {
+      document.getElementById('datasourceManagementModal').classList.remove('active');
+    }
+
+    // 加载数据源列表
+    async function loadDatasourcesList() {
+      try {
+        const response = await fetch(`${API_BASE}/admin/datasources`);
+        const result = await response.json();
+
+        if (!result.success) {
+          throw new Error(result.message);
+        }
+
+        const datasourceList = result.data || [];
+        const tbody = document.getElementById('datasourceTableBody');
+
+        if (datasourceList.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="6" class="empty-state">暂无数据源，请添加新数据源</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = datasourceList.map(ds => `
+          <tr>
+            <td>${ds.name}</td>
+            <td>${ds.host}</td>
+            <td>${ds.port}</td>
+            <td>${ds.database}</td>
+            <td>${ds.createTime || '-'}</td>
+            <td class="actions">
+              <button class="btn btn-sm btn-primary" onclick="editDatasource('${ds.id}')">编辑</button>
+              <button class="btn btn-sm btn-danger" onclick="deleteDatasource('${ds.id}', '${ds.name}')">删除</button>
+            </td>
+          </tr>
+        `).join('');
+      } catch (error) {
+        console.error('加载数据源列表失败:', error);
+        throw error;
+      }
+    }
+
+    // 打开添加数据源Modal
+    function openAddDatasourceModal() {
+      document.getElementById('datasourceModalTitle').textContent = '添加新数据源';
+      document.getElementById('dsId').value = '';
+      document.getElementById('dsName').value = '';
+      document.getElementById('dsHost').value = '';
+      document.getElementById('dsPort').value = '3306';
+      document.getElementById('dsUser').value = '';
+      document.getElementById('dsPassword').value = '';
+      document.getElementById('dsDatabase').value = '';
+      document.getElementById('dsPoolMin').value = '2';
+      document.getElementById('dsPoolMax').value = '10';
+      document.getElementById('dsTestResultContainer').classList.remove('active');
+
+      document.getElementById('datasourceModal').classList.add('active');
+    }
+
+    // 编辑数据源
+    async function editDatasource(id) {
+      try {
+        const response = await fetch(`${API_BASE}/admin/datasources/${id}`);
+        const result = await response.json();
+
+        if (!result.success) {
+          throw new Error(result.message);
+        }
+
+        const ds = result.data;
+
+        document.getElementById('datasourceModalTitle').textContent = '编辑数据源';
+        document.getElementById('dsId').value = ds.id;
+        document.getElementById('dsName').value = ds.name;
+        document.getElementById('dsHost').value = ds.host;
+        document.getElementById('dsPort').value = ds.port;
+        document.getElementById('dsUser').value = ds.user;
+        document.getElementById('dsPassword').value = ''; // 密码不回显
+        document.getElementById('dsDatabase').value = ds.database;
+        document.getElementById('dsPoolMin').value = ds.poolMin || 2;
+        document.getElementById('dsPoolMax').value = ds.poolMax || 10;
+        document.getElementById('dsTestResultContainer').classList.remove('active');
+
+        document.getElementById('datasourceModal').classList.add('active');
+      } catch (error) {
+        alert('❌ 加载数据源失败: ' + error.message);
+      }
+    }
+
+    // 关闭数据源编辑Modal
+    function closeDatasourceModal() {
+      document.getElementById('datasourceModal').classList.remove('active');
+    }
+
+    // 测试数据源连接
+    async function testDatasourceConnection() {
+      const host = document.getElementById('dsHost').value.trim();
+      const port = parseInt(document.getElementById('dsPort').value);
+      const user = document.getElementById('dsUser').value.trim();
+      const password = document.getElementById('dsPassword').value.trim();
+      const database = document.getElementById('dsDatabase').value.trim();
+
+      if (!host || !user || !password || !database) {
+        alert('⚠️ 请填写所有必填字段');
+        return;
+      }
+
+      try {
+        const response = await fetch(`${API_BASE}/admin/datasources/test`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ host, port, user, password, database })
+        });
+
+        const result = await response.json();
+        const container = document.getElementById('dsTestResultContainer');
+        const resultElement = container.querySelector('pre');
+
+        container.classList.add('active');
+
+        if (result.success) {
+          resultElement.style.color = '#4caf50';
+          resultElement.textContent =
+            `✅ ${result.message}\n\n` +
+            `数据库：${result.data.database}\n` +
+            `主机：${result.data.host}`;
+        } else {
+          resultElement.style.color = '#f44336';
+          resultElement.textContent =
+            `❌ ${result.message}\n\n` +
+            `错误代码：${result.error || '未知'}`;
+        }
+      } catch (error) {
+        const container = document.getElementById('dsTestResultContainer');
+        const resultElement = container.querySelector('pre');
+        container.classList.add('active');
+        resultElement.style.color = '#f44336';
+        resultElement.textContent = `❌ 测试连接失败\n\n错误：${error.message}`;
+      }
+    }
+
+    // 保存数据源
+    async function saveDatasource() {
+      const id = document.getElementById('dsId').value;
+      const name = document.getElementById('dsName').value.trim();
+      const host = document.getElementById('dsHost').value.trim();
+      const port = parseInt(document.getElementById('dsPort').value);
+      const user = document.getElementById('dsUser').value.trim();
+      const password = document.getElementById('dsPassword').value.trim();
+      const database = document.getElementById('dsDatabase').value.trim();
+      const poolMin = parseInt(document.getElementById('dsPoolMin').value);
+      const poolMax = parseInt(document.getElementById('dsPoolMax').value);
+
+      if (!name || !host || !user || !database) {
+        alert('⚠️ 请填写所有必填字段');
+        return;
+      }
+
+      if (!password && !id) {
+        alert('⚠️ 请输入密码');
+        return;
+      }
+
+      try {
+        const dsData = { name, host, port, user, database, poolMin, poolMax };
+
+        // 只有在创建新数据源或修改密码时才包含密码
+        if (password) {
+          dsData.password = password;
+        }
+
+        const url = id ? `${API_BASE}/admin/datasources/${id}` : `${API_BASE}/admin/datasources`;
+        const method = id ? 'PUT' : 'POST';
+
+        const response = await fetch(url, {
+          method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(dsData)
+        });
+
+        const result = await response.json();
+
+        if (!result.success) {
+          throw new Error(result.message);
+        }
+
+        alert(id ? '✅ 数据源更新成功！' : '✅ 数据源创建成功！');
+        closeDatasourceModal();
+        await loadDatasourcesList();
+        await loadMetadata(); // 重新加载元数据，更新数据源下拉列表
+      } catch (error) {
+        alert('❌ 保存失败\n\n' + error.message);
+      }
+    }
+
+    // 删除数据源
+    async function deleteDatasource(id, name) {
+      if (!confirm(`确定要删除数据源 "${name}" 吗？\n\n⚠️ 警告：删除后，使用该数据源的API将无法正常工作！\n\n此操作不可恢复！`)) {
+        return;
+      }
+
+      try {
+        const response = await fetch(`${API_BASE}/admin/datasources/${id}`, {
+          method: 'DELETE'
+        });
+
+        const result = await response.json();
+
+        if (!result.success) {
+          throw new Error(result.message);
+        }
+
+        alert('✅ 数据源删除成功！');
+        await loadDatasourcesList();
+        await loadMetadata(); // 重新加载元数据
+      } catch (error) {
+        alert('❌ 删除失败: ' + error.message);
+      }
+    }
+
+    // ========== 分组管理功能 ==========
+
+    // 打开分组管理Modal
+    async function manageGroups() {
+      try {
+        await loadGroupsList();
+        document.getElementById('groupManagementModal').classList.add('active');
+      } catch (error) {
+        alert('❌ 加载分组列表失败: ' + error.message);
+      }
+    }
+
+    // 关闭分组管理Modal
+    function closeGroupManagementModal() {
+      document.getElementById('groupManagementModal').classList.remove('active');
+    }
+
+    // 加载分组列表
+    async function loadGroupsList() {
+      try {
+        const response = await fetch(`${API_BASE}/admin/groups`);
+        const result = await response.json();
+
+        if (!result.success) {
+          throw new Error(result.message);
+        }
+
+        groups = result.data || result.groups || [];
+        renderGroupTable();
+      } catch (error) {
+        console.error('加载分组列表失败:', error);
+        throw error;
+      }
+    }
+
+    // 渲染分组表格
+    function renderGroupTable() {
+      const tbody = document.getElementById('groupTableBody');
+
+      if (!groups || groups.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" class="empty-state">暂无分组</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = groups.map(group => `
+        <tr>
+          <td>${group.name}</td>
+          <td>${group.description || '-'}</td>
+          <td>${group.order || '-'}</td>
+          <td>
+            <button class="btn btn-sm btn-primary" onclick="openEditGroupModal('${group.id}')">编辑</button>
+            <button class="btn btn-sm btn-danger" onclick="deleteGroup('${group.id}')">删除</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    // 打开添加分组Modal
+    function openAddGroupModal() {
+      document.getElementById('groupModalTitle').textContent = '添加新分组';
+      document.getElementById('groupId').value = '';
+      document.getElementById('groupName').value = '';
+      document.getElementById('groupDescription').value = '';
+      document.getElementById('groupOrder').value = (groups.length + 1).toString();
+      document.getElementById('groupModal').classList.add('active');
+    }
+
+    // 打开编辑分组Modal
+    function openEditGroupModal(groupId) {
+      const group = groups.find(g => g.id === groupId);
+      if (!group) {
+        alert('❌ 分组不存在');
+        return;
+      }
+
+      document.getElementById('groupModalTitle').textContent = '编辑分组';
+      document.getElementById('groupId').value = group.id;
+      document.getElementById('groupName').value = group.name;
+      document.getElementById('groupDescription').value = group.description || '';
+      document.getElementById('groupOrder').value = group.order || 1;
+      document.getElementById('groupModal').classList.add('active');
+    }
+
+    // 关闭分组编辑Modal
+    function closeGroupModal() {
+      document.getElementById('groupModal').classList.remove('active');
+    }
+
+    // 保存分组
+    async function saveGroup() {
+      const groupId = document.getElementById('groupId').value;
+      const name = document.getElementById('groupName').value.trim();
+      const description = document.getElementById('groupDescription').value.trim();
+      const order = parseInt(document.getElementById('groupOrder').value) || 1;
+
+      if (!name) {
+        alert('⚠️ 请输入分组名称');
+        return;
+      }
+
+      try {
+        const url = groupId
+          ? `${API_BASE}/admin/groups/${groupId}`
+          : `${API_BASE}/admin/groups`;
+
+        const method = groupId ? 'PUT' : 'POST';
+
+        const response = await fetch(url, {
+          method: method,
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ name, description, order })
+        });
+
+        const result = await response.json();
+
+        if (!result.success) {
+          throw new Error(result.message);
+        }
+
+        alert(`✅ 分组${groupId ? '更新' : '创建'}成功！`);
+        closeGroupModal();
+        await loadGroupsList();
+        await loadMetadata(); // 重新加载元数据，更新统计和下拉框
+        await loadAPIs(); // 重新加载API列表
+      } catch (error) {
+        alert(`❌ 保存失败: ${error.message}`);
+      }
+    }
+
+    // 删除分组
+    async function deleteGroup(groupId) {
+      const group = groups.find(g => g.id === groupId);
+      if (!group) {
+        alert('❌ 分组不存在');
+        return;
+      }
+
+      // 检查是否有API使用此分组
+      const apisInGroup = allApis.filter(api => api.groupId === groupId);
+      if (apisInGroup.length > 0) {
+        if (!confirm(`⚠️ 该分组下有 ${apisInGroup.length} 个API，删除后这些API将变为无分组状态。\n确定要删除吗？`)) {
+          return;
+        }
+      } else {
+        if (!confirm(`确定要删除分组 "${group.name}" 吗？`)) {
+          return;
+        }
+      }
+
+      try {
+        const response = await fetch(`${API_BASE}/admin/groups/${groupId}`, {
+          method: 'DELETE'
+        });
+
+        const result = await response.json();
+
+        if (!result.success) {
+          throw new Error(result.message);
+        }
+
+        alert('✅ 分组删除成功！');
+        await loadGroupsList();
+        await loadMetadata(); // 重新加载元数据
+        await loadAPIs(); // 重新加载API列表
+      } catch (error) {
+        alert('❌ 删除失败: ' + error.message);
+      }
     }
 
     // 刷新数据
-    function refreshData() {
-      loadAPIs();
-      loadGroups();
-      loadDatasources();
+    async function refreshData() {
+      await loadMetadata();
+      await loadAPIs();
     }
 
-    // 过滤API
-    function filterAPIs() {
-      const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-      // TODO: 实现搜索过滤功能
+    // 生成随机ID
+    function generateId() {
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+      let id = '';
+      for (let i = 0; i < 8; i++) {
+        id += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return id;
     }
+
+    // 点击Modal外部关闭
+    document.getElementById('datasourceManagementModal').addEventListener('click', (e) => {
+      if (e.target.id === 'datasourceManagementModal') {
+        closeDatasourceManagementModal();
+      }
+    });
+
+    document.getElementById('datasourceModal').addEventListener('click', (e) => {
+      if (e.target.id === 'datasourceModal') {
+        closeDatasourceModal();
+      }
+    });
+
+    document.getElementById('groupManagementModal').addEventListener('click', (e) => {
+      if (e.target.id === 'groupManagementModal') {
+        closeGroupManagementModal();
+      }
+    });
+
+    document.getElementById('groupModal').addEventListener('click', (e) => {
+      if (e.target.id === 'groupModal') {
+        closeGroupModal();
+      }
+    });
   </script>
 </body>
 </html>
