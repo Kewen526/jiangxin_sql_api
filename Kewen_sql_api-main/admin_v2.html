@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>API 管理系统 - Jiangxin SQL API</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+      background: #f5f7fa;
+      overflow: hidden;
+    }
+
+    /* 顶部导航栏 */
+    .header {
+      height: 60px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 30px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .header-left h1 {
+      font-size: 20px;
+      font-weight: 600;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s;
+    }
+
+    .btn-primary {
+      background: rgba(255,255,255,0.2);
+      color: white;
+      border: 1px solid rgba(255,255,255,0.3);
+    }
+
+    .btn-primary:hover {
+      background: rgba(255,255,255,0.3);
+    }
+
+    /* 主容器 */
+    .main-container {
+      display: flex;
+      height: calc(100vh - 60px);
+    }
+
+    /* 左侧边栏 */
+    .sidebar {
+      width: 300px;
+      background: white;
+      border-right: 1px solid #e0e0e0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sidebar-header {
+      padding: 20px;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .search-box {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #e0e0e0;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+
+    .search-box:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    .sidebar-nav {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px;
+    }
+
+    .nav-item {
+      padding: 12px 15px;
+      margin-bottom: 5px;
+      border-radius: 4px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+
+    .nav-item:hover {
+      background: #f5f7fa;
+    }
+
+    .nav-item.active {
+      background: #667eea;
+      color: white;
+    }
+
+    .tree-container {
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .tree-group {
+      margin-bottom: 10px;
+    }
+
+    .tree-group-header {
+      padding: 10px 15px;
+      background: #f8f9fa;
+      border-radius: 4px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 500;
+      font-size: 14px;
+    }
+
+    .tree-group-header:hover {
+      background: #e9ecef;
+    }
+
+    .tree-group-header .icon {
+      transition: transform 0.2s;
+    }
+
+    .tree-group-header.collapsed .icon {
+      transform: rotate(-90deg);
+    }
+
+    .tree-items {
+      padding-left: 15px;
+      margin-top: 5px;
+    }
+
+    .tree-items.hidden {
+      display: none;
+    }
+
+    .tree-item {
+      padding: 8px 15px;
+      border-left: 2px solid transparent;
+      cursor: pointer;
+      font-size: 13px;
+      color: #666;
+      transition: all 0.2s;
+    }
+
+    .tree-item:hover {
+      background: #f8f9fa;
+      border-left-color: #667eea;
+      color: #333;
+    }
+
+    .tree-item.active {
+      background: #e7f0ff;
+      border-left-color: #667eea;
+      color: #667eea;
+      font-weight: 500;
+    }
+
+    .sidebar-footer {
+      padding: 15px;
+      border-top: 1px solid #e0e0e0;
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn-block {
+      flex: 1;
+      padding: 10px;
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .btn-block:hover {
+      background: #5568d3;
+    }
+
+    /* 右侧内容区 */
+    .content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .content-header {
+      padding: 20px 30px;
+      background: white;
+      border-bottom: 1px solid #e0e0e0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .content-header h2 {
+      font-size: 18px;
+      color: #333;
+    }
+
+    .content-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .content-body {
+      flex: 1;
+      padding: 30px;
+      overflow-y: auto;
+      background: #f5f7fa;
+    }
+
+    .panel {
+      background: white;
+      border-radius: 8px;
+      padding: 30px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      font-size: 14px;
+      color: #333;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #e0e0e0;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    textarea.form-control {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .btn-save {
+      background: #667eea;
+      color: white;
+      padding: 10px 24px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .btn-save:hover {
+      background: #5568d3;
+    }
+
+    .btn-secondary {
+      background: #6c757d;
+      color: white;
+      padding: 10px 24px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .btn-secondary:hover {
+      background: #5a6268;
+    }
+
+    .btn-danger {
+      background: #dc3545;
+      color: white;
+      padding: 10px 24px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .btn-danger:hover {
+      background: #c82333;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #999;
+    }
+
+    .empty-state .icon {
+      font-size: 48px;
+      margin-bottom: 20px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .alert {
+      padding: 12px 16px;
+      border-radius: 4px;
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+
+    .alert-success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    .alert-error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    .table th,
+    .table td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #e0e0e0;
+      font-size: 14px;
+    }
+
+    .table th {
+      background: #f8f9fa;
+      font-weight: 500;
+      color: #666;
+    }
+
+    .table tbody tr:hover {
+      background: #f8f9fa;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 3px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .badge-success {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    .badge-danger {
+      background: #f8d7da;
+      color: #721c24;
+    }
+  </style>
+</head>
+<body>
+  <!-- 顶部导航栏 -->
+  <div class="header">
+    <div class="header-left">
+      <h1>🛠️ API 管理系统</h1>
+      <span id="tenantName" style="opacity: 0.9; font-size: 14px;"></span>
+    </div>
+    <div class="header-right">
+      <div class="user-info">
+        <span id="userEmail"></span>
+        <button class="btn btn-primary" onclick="logout()">退出登录</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 主容器 -->
+  <div class="main-container">
+    <!-- 左侧边栏 -->
+    <div class="sidebar">
+      <div class="sidebar-header">
+        <input type="text" class="search-box" id="searchBox" placeholder="搜索 API...">
+      </div>
+
+      <div class="sidebar-nav">
+        <div class="nav-item active" data-view="apis">
+          📋 API 列表
+        </div>
+        <div class="nav-item" data-view="datasources">
+          🗄️ 数据源
+        </div>
+        <div class="nav-item" data-view="groups">
+          📁 分组管理
+        </div>
+      </div>
+
+      <div class="tree-container hidden" id="treeContainer">
+        <!-- 动态生成的树形结构 -->
+      </div>
+
+      <div class="sidebar-footer">
+        <button class="btn-block" onclick="createNew()">+ 新建</button>
+      </div>
+    </div>
+
+    <!-- 右侧内容区 -->
+    <div class="content">
+      <div class="content-header">
+        <h2 id="contentTitle">欢迎使用</h2>
+        <div class="content-actions" id="contentActions">
+          <!-- 动态生成的操作按钮 -->
+        </div>
+      </div>
+
+      <div class="content-body" id="contentBody">
+        <div class="empty-state">
+          <div class="icon">📦</div>
+          <p>选择左侧菜单开始管理</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 配置
+    const API_BASE = window.location.origin;
+    let currentView = 'apis';
+    let currentItem = null;
+    let authToken = localStorage.getItem('auth_token');
+    let userInfo = null;
+
+    // 检查登录状态
+    async function checkAuth() {
+      if (!authToken) {
+        window.location.href = 'login.html';
+        return false;
+      }
+
+      try {
+        const response = await fetch(`${API_BASE}/api/auth/me`, {
+          headers: {
+            'Authorization': `Bearer ${authToken}`
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error('认证失败');
+        }
+
+        const result = await response.json();
+        userInfo = result.data;
+
+        // 显示用户信息
+        document.getElementById('userEmail').textContent = userInfo.email;
+        document.getElementById('tenantName').textContent = userInfo.tenant.name;
+
+        return true;
+      } catch (error) {
+        console.error('认证检查失败:', error);
+        localStorage.removeItem('auth_token');
+        window.location.href = 'login.html';
+        return false;
+      }
+    }
+
+    // 退出登录
+    function logout() {
+      localStorage.removeItem('auth_token');
+      localStorage.removeItem('user_info');
+      window.location.href = 'login.html';
+    }
+
+    // HTTP 请求封装
+    async function apiRequest(url, options = {}) {
+      const defaultOptions = {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authToken}`
+        }
+      };
+
+      const response = await fetch(`${API_BASE}${url}`, {
+        ...defaultOptions,
+        ...options,
+        headers: {
+          ...defaultOptions.headers,
+          ...options.headers
+        }
+      });
+
+      const result = await response.json();
+
+      if (!result.success) {
+        throw new Error(result.message || '操作失败');
+      }
+
+      return result.data;
+    }
+
+    // 切换视图
+    function switchView(view) {
+      currentView = view;
+      currentItem = null;
+
+      // 更新导航
+      document.querySelectorAll('.nav-item').forEach(item => {
+        item.classList.toggle('active', item.dataset.view === view);
+      });
+
+      // 加载对应视图
+      if (view === 'apis') {
+        loadAPIs();
+      } else if (view === 'datasources') {
+        loadDatasources();
+      } else if (view === 'groups') {
+        loadGroups();
+      }
+    }
+
+    // 加载 API 列表
+    async function loadAPIs() {
+      try {
+        const apis = await apiRequest('/api/apis');
+        const groups = await apiRequest('/api/groups');
+
+        // 构建树形结构
+        const treeContainer = document.getElementById('treeContainer');
+        treeContainer.classList.remove('hidden');
+        treeContainer.innerHTML = '';
+
+        // 按分组组织 API
+        const groupedAPIs = {};
+        groups.forEach(group => {
+          groupedAPIs[group.id] = {
+            ...group,
+            apis: []
+          };
+        });
+
+        // 未分组的 API
+        groupedAPIs['_ungrouped'] = {
+          id: null,
+          name: '未分组',
+          apis: []
+        };
+
+        apis.forEach(api => {
+          const groupId = api.group_id || '_ungrouped';
+          if (groupedAPIs[groupId]) {
+            groupedAPIs[groupId].apis.push(api);
+          }
+        });
+
+        // 渲染树形结构
+        Object.values(groupedAPIs).forEach(group => {
+          if (group.apis.length === 0 && group.id !== null) return;
+
+          const groupDiv = document.createElement('div');
+          groupDiv.className = 'tree-group';
+          groupDiv.innerHTML = `
+            <div class="tree-group-header" onclick="toggleGroup(this)">
+              <span class="icon">▼</span>
+              <span>${group.name} (${group.apis.length})</span>
+            </div>
+            <div class="tree-items">
+              ${group.apis.map(api => `
+                <div class="tree-item" onclick="selectAPI('${api.id}')">
+                  ${api.name}
+                </div>
+              `).join('')}
+            </div>
+          `;
+          treeContainer.appendChild(groupDiv);
+        });
+
+        // 显示统计
+        document.getElementById('contentTitle').textContent = `API 列表 (${apis.length})`;
+        document.getElementById('contentActions').innerHTML = '';
+
+        // 显示列表视图
+        showAPIList(apis);
+
+      } catch (error) {
+        console.error('加载 API 失败:', error);
+        showError(error.message);
+      }
+    }
+
+    // 显示 API 列表
+    function showAPIList(apis) {
+      const contentBody = document.getElementById('contentBody');
+
+      if (apis.length === 0) {
+        contentBody.innerHTML = `
+          <div class="empty-state">
+            <div class="icon">📋</div>
+            <p>还没有 API，点击下方"新建"按钮创建第一个API</p>
+          </div>
+        `;
+        return;
+      }
+
+      contentBody.innerHTML = `
+        <div class="panel">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>名称</th>
+                <th>路径</th>
+                <th>分组</th>
+                <th>状态</th>
+                <th>创建时间</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${apis.map(api => `
+                <tr>
+                  <td>${api.name}</td>
+                  <td><code>${api.path}</code></td>
+                  <td>${api.group_name || '未分组'}</td>
+                  <td><span class="badge ${api.status ? 'badge-success' : 'badge-danger'}">${api.status ? '启用' : '禁用'}</span></td>
+                  <td>${new Date(api.created_at).toLocaleString()}</td>
+                  <td>
+                    <button onclick="selectAPI('${api.id}')" class="btn btn-primary">编辑</button>
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    // 选择 API
+    async function selectAPI(id) {
+      try {
+        const api = await apiRequest(`/api/apis/${id}`);
+        currentItem = api;
+
+        document.getElementById('contentTitle').textContent = `编辑 API: ${api.name}`;
+        document.getElementById('contentActions').innerHTML = `
+          <button class="btn-danger" onclick="deleteAPI('${id}')">删除</button>
+          <button class="btn-save" onclick="saveAPI('${id}')">保存</button>
+        `;
+
+        document.getElementById('contentBody').innerHTML = `
+          <div class="panel">
+            <div class="form-group">
+              <label>API 名称</label>
+              <input type="text" class="form-control" id="apiName" value="${api.name}">
+            </div>
+            <div class="form-group">
+              <label>请求路径</label>
+              <input type="text" class="form-control" id="apiPath" value="${api.path}">
+            </div>
+            <div class="form-group">
+              <label>说明</label>
+              <textarea class="form-control" id="apiNote">${api.note || ''}</textarea>
+            </div>
+            <div class="form-group">
+              <label>SQL 配置（JSON）</label>
+              <textarea class="form-control" id="apiSqlConfig" style="min-height: 200px; font-family: monospace;">${JSON.stringify(api.sql_config, null, 2)}</textarea>
+            </div>
+          </div>
+        `;
+
+        // 高亮选中的树节点
+        document.querySelectorAll('.tree-item').forEach(item => {
+          item.classList.remove('active');
+        });
+        event.target.classList.add('active');
+
+      } catch (error) {
+        console.error('加载 API 详情失败:', error);
+        showError(error.message);
+      }
+    }
+
+    // 保存 API
+    async function saveAPI(id) {
+      try {
+        const data = {
+          name: document.getElementById('apiName').value,
+          path: document.getElementById('apiPath').value,
+          note: document.getElementById('apiNote').value,
+          sql_config: JSON.parse(document.getElementById('apiSqlConfig').value)
+        };
+
+        await apiRequest(`/api/apis/${id}`, {
+          method: 'PUT',
+          body: JSON.stringify(data)
+        });
+
+        showSuccess('保存成功');
+        loadAPIs();
+
+      } catch (error) {
+        console.error('保存失败:', error);
+        showError(error.message);
+      }
+    }
+
+    // 删除 API
+    async function deleteAPI(id) {
+      if (!confirm('确认删除此 API 吗？')) return;
+
+      try {
+        await apiRequest(`/api/apis/${id}`, {
+          method: 'DELETE'
+        });
+
+        showSuccess('删除成功');
+        loadAPIs();
+
+      } catch (error) {
+        console.error('删除失败:', error);
+        showError(error.message);
+      }
+    }
+
+    // 加载数据源列表
+    async function loadDatasources() {
+      try {
+        const datasources = await apiRequest('/api/datasources');
+
+        document.getElementById('treeContainer').classList.add('hidden');
+        document.getElementById('contentTitle').textContent = `数据源管理 (${datasources.length})`;
+        document.getElementById('contentActions').innerHTML = '';
+
+        const contentBody = document.getElementById('contentBody');
+
+        if (datasources.length === 0) {
+          contentBody.innerHTML = `
+            <div class="empty-state">
+              <div class="icon">🗄️</div>
+              <p>还没有数据源，点击下方"新建"按钮添加数据源</p>
+            </div>
+          `;
+          return;
+        }
+
+        contentBody.innerHTML = `
+          <div class="panel">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>名称</th>
+                  <th>主机</th>
+                  <th>端口</th>
+                  <th>数据库</th>
+                  <th>状态</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${datasources.map(ds => `
+                  <tr>
+                    <td>${ds.name}</td>
+                    <td>${ds.host}</td>
+                    <td>${ds.port}</td>
+                    <td>${ds.database_name}</td>
+                    <td><span class="badge ${ds.status ? 'badge-success' : 'badge-danger'}">${ds.status ? '连接正常' : '已禁用'}</span></td>
+                    <td>
+                      <button onclick="editDatasource('${ds.id}')" class="btn btn-primary">编辑</button>
+                      <button onclick="deleteDatasource('${ds.id}')" class="btn btn-danger">删除</button>
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+
+      } catch (error) {
+        console.error('加载数据源失败:', error);
+        showError(error.message);
+      }
+    }
+
+    // 加载分组列表
+    async function loadGroups() {
+      try {
+        const groups = await apiRequest('/api/groups');
+
+        document.getElementById('treeContainer').classList.add('hidden');
+        document.getElementById('contentTitle').textContent = `分组管理 (${groups.length})`;
+        document.getElementById('contentActions').innerHTML = '';
+
+        const contentBody = document.getElementById('contentBody');
+
+        if (groups.length === 0) {
+          contentBody.innerHTML = `
+            <div class="empty-state">
+              <div class="icon">📁</div>
+              <p>还没有分组，点击下方"新建"按钮创建分组</p>
+            </div>
+          `;
+          return;
+        }
+
+        contentBody.innerHTML = `
+          <div class="panel">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>名称</th>
+                  <th>说明</th>
+                  <th>API 数量</th>
+                  <th>排序</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${groups.map(group => `
+                  <tr>
+                    <td>${group.name}</td>
+                    <td>${group.description || '-'}</td>
+                    <td>${group.api_count}</td>
+                    <td>${group.sort_order}</td>
+                    <td>
+                      <button onclick="editGroup('${group.id}')" class="btn btn-primary">编辑</button>
+                      <button onclick="deleteGroup('${group.id}')" class="btn btn-danger">删除</button>
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+
+      } catch (error) {
+        console.error('加载分组失败:', error);
+        showError(error.message);
+      }
+    }
+
+    // 折叠/展开分组
+    function toggleGroup(header) {
+      const items = header.nextElementSibling;
+      items.classList.toggle('hidden');
+      header.classList.toggle('collapsed');
+    }
+
+    // 新建
+    function createNew() {
+      // 根据当前视图创建不同类型的项目
+      if (currentView === 'apis') {
+        alert('创建 API 功能开发中...');
+      } else if (currentView === 'datasources') {
+        alert('创建数据源功能开发中...');
+      } else if (currentView === 'groups') {
+        alert('创建分组功能开发中...');
+      }
+    }
+
+    // 显示成功提示
+    function showSuccess(message) {
+      const alertDiv = document.createElement('div');
+      alertDiv.className = 'alert alert-success';
+      alertDiv.textContent = message;
+
+      const contentBody = document.getElementById('contentBody');
+      contentBody.insertBefore(alertDiv, contentBody.firstChild);
+
+      setTimeout(() => alertDiv.remove(), 3000);
+    }
+
+    // 显示错误提示
+    function showError(message) {
+      const alertDiv = document.createElement('div');
+      alertDiv.className = 'alert alert-error';
+      alertDiv.textContent = message;
+
+      const contentBody = document.getElementById('contentBody');
+      contentBody.insertBefore(alertDiv, contentBody.firstChild);
+
+      setTimeout(() => alertDiv.remove(), 5000);
+    }
+
+    // 事件监听
+    document.querySelectorAll('.nav-item').forEach(item => {
+      item.addEventListener('click', () => {
+        switchView(item.dataset.view);
+      });
+    });
+
+    // 初始化
+    window.addEventListener('load', async () => {
+      const authOk = await checkAuth();
+      if (authOk) {
+        loadAPIs();
+      }
+    });
+  </script>
+</body>
+</html>
