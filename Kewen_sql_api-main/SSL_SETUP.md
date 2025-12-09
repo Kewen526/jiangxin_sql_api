@@ -22,7 +22,7 @@
 
 ### 前提条件
 
-1. ✅ 有一个公网域名（例如：api.yourdomain.com）
+1. ✅ 有一个公网域名（当前使用：kewenai.asia）
 2. ✅ DNS 已解析到服务器 IP
 3. ✅ 服务器 80 和 443 端口开放
 
@@ -47,8 +47,8 @@ sudo yum install certbot python3-certbot-nginx
 #### 方式 A：自动配置 Nginx（推荐）
 
 ```bash
-# 替换 your-domain.com 为您的域名
-sudo certbot --nginx -d your-domain.com -d www.your-domain.com
+# 替换 kewenai.asia 为您的域名
+sudo certbot --nginx -d kewenai.asia -d www.kewenai.asia
 ```
 
 Certbot 会自动：
@@ -59,12 +59,12 @@ Certbot 会自动：
 #### 方式 B：仅申请证书（手动配置）
 
 ```bash
-sudo certbot certonly --nginx -d your-domain.com -d www.your-domain.com
+sudo certbot certonly --nginx -d kewenai.asia -d www.kewenai.asia
 ```
 
 证书位置：
-- 完整链：`/etc/letsencrypt/live/your-domain.com/fullchain.pem`
-- 私钥：`/etc/letsencrypt/live/your-domain.com/privkey.pem`
+- 完整链：`/etc/letsencrypt/live/kewenai.asia/fullchain.pem`
+- 私钥：`/etc/letsencrypt/live/kewenai.asia/privkey.pem`
 
 ### 步骤 3：配置 Nginx
 
@@ -110,12 +110,12 @@ Certbot 会自动创建续期任务，无需手动配置。
 
 访问您的域名：
 ```
-https://your-domain.com
+https://kewenai.asia
 ```
 
 检查证书：
 ```bash
-curl -I https://your-domain.com
+curl -I https://kewenai.asia
 ```
 
 ---
@@ -271,10 +271,10 @@ sudo cp -r /etc/letsencrypt /backup/letsencrypt-$(date +%Y%m%d)
 2. **命令行测试**：
 ```bash
 # 检查证书信息
-openssl s_client -connect your-domain.com:443 -servername your-domain.com
+openssl s_client -connect kewenai.asia:443 -servername kewenai.asia
 
 # 检查证书过期时间
-echo | openssl s_client -connect your-domain.com:443 2>/dev/null | openssl x509 -noout -dates
+echo | openssl s_client -connect kewenai.asia:443 2>/dev/null | openssl x509 -noout -dates
 ```
 
 ---

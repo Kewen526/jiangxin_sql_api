@@ -27,6 +27,7 @@ function parseSQLParams(sql) {
 
 /**
  * 执行SQL查询
+ * 支持特殊数据源 'PLATFORM' - 使用平台数据库
  */
 async function executeSQL(datasourceId, sql, params, requestParams) {
   try {
@@ -34,6 +35,12 @@ async function executeSQL(datasourceId, sql, params, requestParams) {
     const values = params.map(paramName => {
       return requestParams[paramName] || null;
     });
+
+    // 特殊处理：PLATFORM数据源使用平台数据库
+    if (datasourceId === 'PLATFORM') {
+      const results = await query(sql, values);
+      return results;
+    }
 
     // 执行查询
     const results = await poolManager.query(datasourceId, sql, values);
@@ -110,7 +117,7 @@ export async function registerDynamicRoutes(fastify) {
 
               // 执行SQL
               const results = await executeSQL(
-                sqlConfig.datasource,
+                sqlConfig.datasource_id || sqlConfig.datasource,
                 parsedSQL,
                 sqlParams,
                 requestParams
