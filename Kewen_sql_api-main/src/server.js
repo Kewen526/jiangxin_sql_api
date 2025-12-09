@@ -29,7 +29,7 @@ dotenv.config();
 const PORT = parseInt(process.env.PORT) || 3000;
 const HOST = process.env.HOST || '0.0.0.0';
 const LOG_LEVEL = process.env.LOG_LEVEL || 'info';
-const API_CONFIG_PATH = process.env.API_CONFIG_PATH || './api_config (1).json';
+const API_CONFIG_PATH = process.env.API_CONFIG_PATH || './api_config.json';
 
 /**
  * 创建 Fastify 实例（优化配置）

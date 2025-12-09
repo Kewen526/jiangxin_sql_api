@@ -1,6 +1,6 @@
 /**
  * API 配置管理工具
- * 负责读取、修改、保存 api_config (1).json
+ * 负责读取、修改、保存 api_config.json
  * 支持 DBAPI 真实格式：多SQL、多Task
  */
 
@@ -11,7 +11,7 @@ import datasourceManager from './datasourceManager.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const CONFIG_PATH = path.join(__dirname, '../../api_config (1).json');
+const CONFIG_PATH = path.join(__dirname, '../../api_config.json');
 const GROUPS_PATH = path.join(__dirname, '../../groups.json');
 
 class ConfigManager {
