@@ -18,7 +18,10 @@ import authRoutes from './routes/authRoutes.js';
 import datasourceRoutes from './routes/datasourceRoutes.js';
 import groupRoutes from './routes/groupRoutes.js';
 import apiConfigRoutes from './routes/apiConfigRoutes.js';
+import apiLogsRoutes from './routes/apiLogsRoutes.js';
+import apiDocsRoutes from './routes/apiDocsRoutes.js';
 import { testConnection as testPlatformDb, closePlatformPool } from './auth/platformDb.js';
+import { registerDynamicRoutes } from './utils/dynamicRoutes.js';
 
 // 加载环境变量
 dotenv.config();
@@ -99,31 +102,34 @@ async function start() {
     console.log('📝 注册认证路由...');
     await fastify.register(authRoutes);
 
-    // 5. 注册管理API路由（数据源、分组、API配置）
+    // 5. 初始化租户数据源连接池
+    console.log('🔌 初始化租户数据源连接池...');
+    // 这里会从数据库加载所有租户的数据源并建立连接池
+    // 暂时跳过，将在API调用时动态加载
+
+    // 6. 注册管理API路由（数据源、分组、API配置、日志、文档）
     console.log('📝 注册管理API路由...');
     await fastify.register(datasourceRoutes);
     await fastify.register(groupRoutes);
     await fastify.register(apiConfigRoutes);
+    await fastify.register(apiLogsRoutes);
+    await fastify.register(apiDocsRoutes);
 
-    // 6. 注册系统路由
+    // 7. 注册系统路由
     console.log('📝 注册系统路由...');
     registerSystemRoutes(fastify);
 
-    // 7. 注册管理路由（旧版，兼容）
+    // 8. 注册管理路由（旧版，兼容）
     console.log('📝 注册旧版管理路由...');
     registerAdminRoutes(fastify);
 
-    // 8. 注册示例代码路由
+    // 9. 注册示例代码路由
     console.log('📝 注册示例代码路由...');
     registerExampleRoutes(fastify);
 
-    // 9. 自动注册 API 路由（可选，从 JSON 或数据库加载）
-    // console.log('📝 注册 API 路由...');
-    // await registerAutoRoutes(fastify, API_CONFIG_PATH);
-
-    // 10. 初始化路由重载器（可选）
-    // console.log('🔧 初始化路由重载器...');
-    // routeReloader.initialize(fastify, API_CONFIG_PATH);
+    // 10. 注册动态API路由（从数据库加载）
+    console.log('📝 注册动态API路由...');
+    await registerDynamicRoutes(fastify);
 
     // 11. 启动 HTTP 服务器
     await fastify.listen({ port: PORT, host: HOST });

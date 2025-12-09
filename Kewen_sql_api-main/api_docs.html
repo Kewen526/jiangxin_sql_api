@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>API 文档 - Jiangxin SQL API</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+      background: #f5f7fa;
+      color: #333;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 40px 20px;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .header h1 {
+      font-size: 32px;
+      margin-bottom: 10px;
+    }
+
+    .header p {
+      font-size: 16px;
+      opacity: 0.9;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+
+    .sidebar {
+      position: fixed;
+      left: 0;
+      top: 160px;
+      width: 280px;
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      max-height: calc(100vh - 200px);
+      overflow-y: auto;
+    }
+
+    .sidebar h3 {
+      font-size: 14px;
+      color: #999;
+      margin-bottom: 15px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .nav-group {
+      margin-bottom: 20px;
+    }
+
+    .nav-group-title {
+      font-weight: 600;
+      font-size: 14px;
+      color: #667eea;
+      margin-bottom: 10px;
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 4px;
+      transition: background 0.2s;
+    }
+
+    .nav-group-title:hover {
+      background: #f5f7fa;
+    }
+
+    .nav-item {
+      padding: 8px 12px;
+      margin-bottom: 5px;
+      cursor: pointer;
+      border-radius: 4px;
+      font-size: 13px;
+      color: #666;
+      border-left: 3px solid transparent;
+      transition: all 0.2s;
+    }
+
+    .nav-item:hover {
+      background: #f5f7fa;
+      border-left-color: #667eea;
+      color: #333;
+    }
+
+    .nav-item.active {
+      background: #e7f0ff;
+      border-left-color: #667eea;
+      color: #667eea;
+      font-weight: 500;
+    }
+
+    .content {
+      margin-left: 320px;
+    }
+
+    .api-group {
+      background: white;
+      border-radius: 8px;
+      padding: 30px;
+      margin-bottom: 30px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .api-group-title {
+      font-size: 24px;
+      margin-bottom: 10px;
+      color: #333;
+    }
+
+    .api-group-desc {
+      color: #666;
+      margin-bottom: 30px;
+    }
+
+    .api-item {
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+
+    .api-header {
+      display: flex;
+      align-items: center;
+      padding: 20px;
+      background: #f8f9fa;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .api-header:hover {
+      background: #f0f2f5;
+    }
+
+    .api-method {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-weight: 600;
+      font-size: 12px;
+      margin-right: 15px;
+      min-width: 60px;
+      text-align: center;
+    }
+
+    .method-GET {
+      background: #e3f2fd;
+      color: #1976d2;
+    }
+
+    .method-POST {
+      background: #e8f5e9;
+      color: #388e3c;
+    }
+
+    .method-PUT {
+      background: #fff3e0;
+      color: #f57c00;
+    }
+
+    .method-DELETE {
+      background: #ffebee;
+      color: #d32f2f;
+    }
+
+    .api-path {
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+      font-weight: 500;
+      color: #333;
+      flex: 1;
+    }
+
+    .api-name {
+      font-size: 14px;
+      color: #666;
+      margin-left: 15px;
+    }
+
+    .api-body {
+      padding: 20px;
+      display: none;
+    }
+
+    .api-body.active {
+      display: block;
+    }
+
+    .api-section {
+      margin-bottom: 25px;
+    }
+
+    .api-section-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 15px;
+      color: #333;
+    }
+
+    .api-description {
+      color: #666;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    .param-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    .param-table th {
+      background: #f8f9fa;
+      padding: 12px;
+      text-align: left;
+      font-weight: 600;
+      color: #666;
+      border-bottom: 2px solid #e0e0e0;
+    }
+
+    .param-table td {
+      padding: 12px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .param-name {
+      font-family: 'Courier New', monospace;
+      color: #667eea;
+      font-weight: 500;
+    }
+
+    .param-type {
+      color: #999;
+      font-size: 12px;
+    }
+
+    .param-required {
+      color: #d32f2f;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .code-block {
+      background: #2d2d2d;
+      color: #f8f8f2;
+      padding: 20px;
+      border-radius: 6px;
+      overflow-x: auto;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .code-block pre {
+      margin: 0;
+    }
+
+    .try-button {
+      background: #667eea;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.3s;
+    }
+
+    .try-button:hover {
+      background: #5568d3;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 3px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .badge-required {
+      background: #ffebee;
+      color: #d32f2f;
+    }
+
+    .badge-optional {
+      background: #e0e0e0;
+      color: #666;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #999;
+    }
+
+    @media (max-width: 1024px) {
+      .sidebar {
+        display: none;
+      }
+
+      .content {
+        margin-left: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1 id="tenantName">API 文档</h1>
+    <p>自动生成的 REST API 文档</p>
+  </div>
+
+  <div class="container">
+    <div class="sidebar" id="sidebar">
+      <h3>目录</h3>
+      <div id="sidebarNav"></div>
+    </div>
+
+    <div class="content" id="content">
+      <div class="empty-state">
+        <p>加载中...</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = window.location.origin;
+    let docsData = null;
+
+    // 从URL获取tenant_id
+    const urlParams = new URLSearchParams(window.location.search);
+    const tenantId = urlParams.get('tenant_id');
+
+    if (!tenantId) {
+      document.getElementById('content').innerHTML = `
+        <div class="empty-state">
+          <h3>缺少参数</h3>
+          <p>请在URL中提供 tenant_id 参数</p>
+          <p>示例：?tenant_id=t_xxxxx</p>
+        </div>
+      `;
+    } else {
+      loadDocs();
+    }
+
+    async function loadDocs() {
+      try {
+        const response = await fetch(`${API_BASE}/api/docs/data?tenant_id=${tenantId}`);
+        const result = await response.json();
+
+        if (!result.success) {
+          throw new Error(result.message || '加载失败');
+        }
+
+        docsData = result.data;
+        renderDocs();
+
+      } catch (error) {
+        console.error('加载文档失败:', error);
+        document.getElementById('content').innerHTML = `
+          <div class="empty-state">
+            <h3>加载失败</h3>
+            <p>${error.message}</p>
+          </div>
+        `;
+      }
+    }
+
+    function renderDocs() {
+      // 更新标题
+      document.getElementById('tenantName').textContent = `${docsData.tenant.name} - API 文档`;
+
+      // 渲染侧边栏导航
+      renderSidebar();
+
+      // 渲染内容
+      renderContent();
+    }
+
+    function renderSidebar() {
+      const nav = document.getElementById('sidebarNav');
+      let html = '';
+
+      docsData.groups.forEach(group => {
+        html += `
+          <div class="nav-group">
+            <div class="nav-group-title">${group.name}</div>
+            ${group.apis.map(api => `
+              <div class="nav-item" onclick="scrollToAPI('${api.id}')">
+                ${api.name}
+              </div>
+            `).join('')}
+          </div>
+        `;
+      });
+
+      nav.innerHTML = html;
+    }
+
+    function renderContent() {
+      const content = document.getElementById('content');
+      let html = '';
+
+      docsData.groups.forEach(group => {
+        html += `
+          <div class="api-group">
+            <h2 class="api-group-title">${group.name}</h2>
+            ${group.description ? `<p class="api-group-desc">${group.description}</p>` : ''}
+
+            ${group.apis.map(api => renderAPI(api)).join('')}
+          </div>
+        `;
+      });
+
+      content.innerHTML = html;
+    }
+
+    function renderAPI(api) {
+      const method = api.sql_config.method || 'POST';
+      const params = api.params || [];
+
+      return `
+        <div class="api-item" id="api-${api.id}">
+          <div class="api-header" onclick="toggleAPI('${api.id}')">
+            <span class="api-method method-${method}">${method}</span>
+            <span class="api-path">${api.path}</span>
+            <span class="api-name">${api.name}</span>
+          </div>
+
+          <div class="api-body" id="api-body-${api.id}">
+            ${api.note ? `
+              <div class="api-section">
+                <div class="api-section-title">说明</div>
+                <div class="api-description">${api.note}</div>
+              </div>
+            ` : ''}
+
+            ${params.length > 0 ? `
+              <div class="api-section">
+                <div class="api-section-title">请求参数</div>
+                <table class="param-table">
+                  <thead>
+                    <tr>
+                      <th>参数名</th>
+                      <th>类型</th>
+                      <th>必填</th>
+                      <th>说明</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${params.map(param => `
+                      <tr>
+                        <td><span class="param-name">${param.name}</span></td>
+                        <td><span class="param-type">${param.type || 'string'}</span></td>
+                        <td>${param.required ? '<span class="badge badge-required">必填</span>' : '<span class="badge badge-optional">可选</span>'}</td>
+                        <td>${param.description || '-'}</td>
+                      </tr>
+                    `).join('')}
+                  </tbody>
+                </table>
+              </div>
+            ` : ''}
+
+            <div class="api-section">
+              <div class="api-section-title">请求示例</div>
+              <div class="code-block">
+                <pre>${generateCurlExample(api)}</pre>
+              </div>
+            </div>
+
+            <div class="api-section">
+              <div class="api-section-title">响应示例</div>
+              <div class="code-block">
+                <pre>${generateResponseExample(api)}</pre>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function toggleAPI(id) {
+      const body = document.getElementById(`api-body-${id}`);
+      body.classList.toggle('active');
+    }
+
+    function scrollToAPI(id) {
+      const element = document.getElementById(`api-${id}`);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        // 展开API
+        const body = document.getElementById(`api-body-${id}`);
+        body.classList.add('active');
+      }
+    }
+
+    function generateCurlExample(api) {
+      const method = api.sql_config.method || 'POST';
+      const testParams = api.test_params || {};
+      const params = api.params || [];
+
+      let curl = `curl -X ${method} ${API_BASE}${api.path}`;
+
+      if (method === 'POST' || method === 'PUT') {
+        curl += ` \\
+  -H "Content-Type: application/json"`;
+
+        if (params.length > 0) {
+          const body = {};
+          params.forEach(param => {
+            body[param.name] = testParams[param.name] || `<${param.name}>`;
+          });
+
+          curl += ` \\
+  -d '${JSON.stringify(body, null, 2)}'`;
+        }
+      } else if (method === 'GET' && params.length > 0) {
+        const queryParams = params.map(param => {
+          const value = testParams[param.name] || `<${param.name}>`;
+          return `${param.name}=${value}`;
+        }).join('&');
+
+        curl += `?${queryParams}`;
+      }
+
+      return curl;
+    }
+
+    function generateResponseExample(api) {
+      return JSON.stringify({
+        success: true,
+        data: [
+          {
+            id: 1,
+            name: "示例数据",
+            created_at: "2024-01-01 00:00:00"
+          }
+        ]
+      }, null, 2);
+    }
+  </script>
+</body>
+</html>
