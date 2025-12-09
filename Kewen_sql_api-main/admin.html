@@ -900,7 +900,8 @@
   </div>
 
   <script>
-    const API_BASE = 'http://47.104.72.198:3000';
+    // 使用相对路径，自动适配当前域名和协议
+    const API_BASE = window.location.origin;
     let allApis = [];
     let groups = [];
     let datasources = [];
