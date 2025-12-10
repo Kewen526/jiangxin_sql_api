@@ -436,12 +436,21 @@ export function registerAdminRoutes(fastify) {
       try {
         const newDatasource = await datasourceManager.createDatasource(request.body);
 
-        // 动态添加到连接池
+        // 动态添加到连接池 - 如果连接失败，需要删除已保存的配置并报错
         try {
           await poolManager.addDatasourcePool(newDatasource);
         } catch (poolError) {
           console.error('添加到连接池失败:', poolError.message);
-          // 即使添加到连接池失败，数据源配置也已保存
+          // 连接池添加失败，删除已保存的配置
+          try {
+            await datasourceManager.deleteDatasource(newDatasource.id);
+          } catch (deleteError) {
+            console.error('回滚数据源配置失败:', deleteError.message);
+          }
+          return reply.code(400).send({
+            success: false,
+            message: '数据源连接失败: ' + poolError.message
+          });
         }
 
         // 不返回密码
@@ -469,16 +478,35 @@ export function registerAdminRoutes(fastify) {
     },
     handler: async (request, reply) => {
       try {
+        // 先获取旧配置，用于回滚
+        const oldDatasource = await datasourceManager.getDatasourceById(request.params.id);
+        if (!oldDatasource) {
+          return reply.code(404).send({
+            success: false,
+            message: '数据源不存在'
+          });
+        }
+
         const updatedDatasource = await datasourceManager.updateDatasource(
           request.params.id,
           request.body
         );
 
-        // 重新加载连接池
+        // 重新加载连接池 - 如果失败，需要回滚配置并报错
         try {
           await poolManager.reloadDatasourcePool(request.params.id, updatedDatasource);
         } catch (poolError) {
           console.error('重新加载连接池失败:', poolError.message);
+          // 回滚到旧配置
+          try {
+            await datasourceManager.updateDatasource(request.params.id, oldDatasource);
+          } catch (rollbackError) {
+            console.error('回滚数据源配置失败:', rollbackError.message);
+          }
+          return reply.code(400).send({
+            success: false,
+            message: '数据源连接失败: ' + poolError.message
+          });
         }
 
         // 不返回密码

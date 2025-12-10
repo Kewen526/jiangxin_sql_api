@@ -21,8 +21,7 @@ class DatasourceManager {
    */
   async getAllDatasources(envConfig = {}) {
     try {
-      const content = await fs.readFile(DATASOURCES_PATH, 'utf-8');
-      const config = JSON.parse(content);
+      const config = await this._readConfig();
 
       // 替换环境变量占位符
       const datasources = (config.datasources || []).map(ds => {
@@ -41,10 +40,6 @@ class DatasourceManager {
       return datasources;
     } catch (error) {
       console.error('读取数据源配置失败:', error);
-      // 如果文件不存在，返回空数组
-      if (error.code === 'ENOENT') {
-        return [];
-      }
       throw new Error('读取数据源配置失败');
     }
   }
@@ -55,23 +50,22 @@ class DatasourceManager {
    */
   async getDatasourcesList() {
     try {
-      const content = await fs.readFile(DATASOURCES_PATH, 'utf-8');
-      const config = JSON.parse(content);
+      const config = await this._readConfig();
 
       return (config.datasources || []).map(ds => ({
         id: ds.id,
         name: ds.name,
         host: ds.host,
         port: ds.port,
+        user: ds.user,
         database: ds.database,
+        poolMin: ds.poolMin,
+        poolMax: ds.poolMax,
         createTime: ds.createTime,
         updateTime: ds.updateTime
       }));
     } catch (error) {
       console.error('读取数据源列表失败:', error);
-      if (error.code === 'ENOENT') {
-        return [];
-      }
       throw new Error('读取数据源列表失败');
     }
   }
@@ -256,11 +250,14 @@ class DatasourceManager {
       const content = await fs.readFile(DATASOURCES_PATH, 'utf-8');
       return JSON.parse(content);
     } catch (error) {
-      console.error('读取数据源配置失败:', error);
       if (error.code === 'ENOENT') {
-        // 文件不存在，返回空配置
-        return { datasources: [] };
+        // 文件不存在，自动创建空配置文件
+        console.log('📝 数据源配置文件不存在，自动创建...');
+        const emptyConfig = { datasources: [] };
+        await this._saveConfig(emptyConfig);
+        return emptyConfig;
       }
+      console.error('读取数据源配置失败:', error);
       throw new Error('读取数据源配置失败');
     }
   }

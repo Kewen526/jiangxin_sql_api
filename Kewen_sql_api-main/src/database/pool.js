@@ -248,11 +248,60 @@ class DatabasePoolManager {
    * @returns {boolean} 是否重新加载成功
    */
   async reloadDatasourcePool(datasourceId, dsConfig) {
-    // 先删除旧的连接池
-    await this.removeDatasourcePool(datasourceId);
-    // 再添加新的连接池
-    await this.addDatasourcePool(dsConfig);
-    return true;
+    // 保存旧的连接池引用，用于回滚
+    const oldPool = this.pools.get(datasourceId);
+
+    // 先尝试创建新的连接池（不删除旧的）
+    try {
+      const poolConfig = {
+        host: dsConfig.host,
+        port: parseInt(dsConfig.port) || 3306,
+        user: dsConfig.user,
+        password: dsConfig.password,
+        database: dsConfig.database,
+        connectionLimit: dsConfig.poolMax || 30,
+        queueLimit: 0,
+        waitForConnections: true,
+        enableKeepAlive: true,
+        keepAliveInitialDelay: 0,
+        connectTimeout: 10000,
+        multipleStatements: true,
+        namedPlaceholders: false,
+        dateStrings: true,
+        charset: 'utf8mb4',
+        timezone: '+08:00',
+        typeCast: function(field, next) {
+          if (field.type === 'BLOB' || field.type === 'VAR_STRING') {
+            return field.string();
+          }
+          return next();
+        }
+      };
+
+      const newPool = mysql.createPool(poolConfig);
+
+      // 测试新连接
+      const connection = await newPool.getConnection();
+      console.log(`✅ 数据源 ${datasourceId} (${dsConfig.name}) 重新连接成功`);
+      connection.release();
+
+      // 新连接成功后，关闭旧连接池
+      if (oldPool) {
+        try {
+          await oldPool.end();
+        } catch (closeError) {
+          console.warn(`⚠️ 关闭旧连接池失败: ${closeError.message}`);
+        }
+      }
+
+      // 更新连接池映射
+      this.pools.set(datasourceId, newPool);
+      return true;
+    } catch (error) {
+      // 新连接失败，保持旧连接池不变
+      console.error(`❌ 数据源 ${datasourceId} 重新连接失败:`, error.message);
+      throw error;
+    }
   }
 }
 
