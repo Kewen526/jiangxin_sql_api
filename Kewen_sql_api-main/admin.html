@@ -790,10 +790,10 @@
         </div>
 
         <div class="detail-tabs">
-          <button class="detail-tab active" onclick="switchTab('basic')">基本信息</button>
-          <button class="detail-tab" onclick="switchTab('sql')">SQL配置</button>
-          <button class="detail-tab" onclick="switchTab('params')">参数</button>
-          <button class="detail-tab" onclick="switchTab('test')">测试</button>
+          <button class="detail-tab active" onclick="switchTab('basic', event)">基本信息</button>
+          <button class="detail-tab" onclick="switchTab('sql', event)">SQL配置</button>
+          <button class="detail-tab" onclick="switchTab('params', event)">参数</button>
+          <button class="detail-tab" onclick="switchTab('test', event)">测试</button>
         </div>
 
         <div class="detail-content">
@@ -815,6 +815,12 @@
               <label class="form-label">所属分组 *</label>
               <select class="form-select" id="apiGroup">
                 <option value="">选择分组</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">数据源 *</label>
+              <select class="form-select" id="apiDatasource">
+                <option value="">选择数据源</option>
               </select>
             </div>
             <div class="form-group">
@@ -840,13 +846,6 @@
 
           <!-- SQL配置 Tab -->
           <div class="tab-pane" id="tab-sql">
-            <div class="form-group">
-              <label class="form-label">数据源 *</label>
-              <select class="form-select" id="apiDatasource">
-                <option value="">选择数据源</option>
-              </select>
-            </div>
-
             <!-- SQL多标签页 -->
             <div class="sql-tabs-container">
               <label class="form-label">SQL语句 *</label>
@@ -1194,7 +1193,7 @@
       const method = 'POST';
       const isActive = currentAPI && currentAPI.id === api.id ? 'active' : '';
       return `
-        <div class="api-item ${isActive}" onclick="selectAPI('${api.id}')">
+        <div class="api-item ${isActive}" data-id="${api.id}" onclick="selectAPI('${api.id}', event)">
           <span class="api-method ${method.toLowerCase()}">${method}</span>
           <span>${api.name}</span>
         </div>
@@ -1239,7 +1238,7 @@
     });
 
     // 选择API
-    async function selectAPI(apiId) {
+    async function selectAPI(apiId, event) {
       try {
         const response = await fetch(`${API_BASE}/admin/apis/${apiId}`);
         if (!response.ok) throw new Error('加载失败');
@@ -1251,7 +1250,13 @@
         document.querySelectorAll('.api-item').forEach(item => {
           item.classList.remove('active');
         });
-        event.currentTarget.classList.add('active');
+        // 通过apiId找到对应的元素并添加active类
+        const clickedItem = document.querySelector(`.api-item[data-id="${apiId}"]`);
+        if (clickedItem) {
+          clickedItem.classList.add('active');
+        } else if (event && event.currentTarget) {
+          event.currentTarget.classList.add('active');
+        }
 
         // 显示详情面板
         document.getElementById('welcomeScreen').style.display = 'none';
@@ -1373,12 +1378,24 @@
     }
 
     // 切换Tab
-    function switchTab(tabName) {
+    function switchTab(tabName, event) {
       // 更新Tab按钮状态
       document.querySelectorAll('.detail-tab').forEach(tab => {
         tab.classList.remove('active');
       });
-      event.currentTarget.classList.add('active');
+      if (event && event.currentTarget) {
+        event.currentTarget.classList.add('active');
+      } else {
+        // 如果没有event，通过tabName找到对应的按钮
+        const tabs = document.querySelectorAll('.detail-tab');
+        tabs.forEach(tab => {
+          if (tab.textContent.includes(tabName === 'basic' ? '基本信息' :
+              tabName === 'sql' ? 'SQL配置' :
+              tabName === 'params' ? '参数' : '测试')) {
+            tab.classList.add('active');
+          }
+        });
+      }
 
       // 更新Tab内容
       document.querySelectorAll('.tab-pane').forEach(pane => {
