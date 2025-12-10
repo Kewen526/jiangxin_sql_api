@@ -95,8 +95,14 @@ async function start() {
       console.warn('⚠️  平台数据库连接失败，认证功能将不可用');
     }
 
-    // 3. 初始化业务数据库连接池（可选，用于租户数据源）
-    // await poolManager.initialize(process.env);
+    // 3. 初始化业务数据库连接池（从datasources.json加载）
+    console.log('🔌 初始化业务数据源连接池...');
+    try {
+      await poolManager.initialize(process.env);
+    } catch (error) {
+      console.error('⚠️  业务数据源初始化失败:', error.message);
+      console.warn('⚠️  部分API可能无法使用，请检查数据源配置');
+    }
 
     // 4. 注册认证路由
     console.log('📝 注册认证路由...');
