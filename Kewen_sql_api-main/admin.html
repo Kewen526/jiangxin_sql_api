@@ -510,6 +510,16 @@
       background: var(--bg-hover);
     }
 
+    .btn-warning {
+      background: #ff9800;
+      color: #000;
+      border: 1px solid #e68900;
+    }
+
+    .btn-warning:hover {
+      background: #e68900;
+    }
+
     .btn-sm {
       padding: 5px 10px;
       font-size: 12px;
@@ -742,6 +752,7 @@
       <button class="btn btn-secondary" onclick="manageDatasources()">数据源</button>
       <button class="btn btn-secondary" onclick="manageGroups()">分组</button>
       <button class="btn btn-secondary" onclick="refreshData()">刷新</button>
+      <button class="btn btn-warning" onclick="reloadConfig()" title="重新加载API配置，无需重启服务">🔄 热加载</button>
     </div>
   </div>
 
@@ -2091,6 +2102,29 @@
     async function refreshData() {
       await loadMetadata();
       await loadAPIs();
+    }
+
+    // 热加载配置（无需重启服务器）
+    async function reloadConfig() {
+      try {
+        const response = await fetch(`${API_BASE}/admin/restart`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          showNotification('✅ ' + result.message, 'success');
+          // 刷新页面数据
+          await refreshData();
+        } else {
+          showNotification('❌ 热加载失败: ' + result.message, 'error');
+        }
+      } catch (error) {
+        console.error('热加载失败:', error);
+        showNotification('❌ 热加载失败: ' + error.message, 'error');
+      }
     }
 
     // 生成随机ID

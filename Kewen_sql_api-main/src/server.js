@@ -131,7 +131,14 @@ async function start() {
     console.log('📝 注册动态API路由...');
     await registerDynamicRoutes(fastify);
 
-    // 11. 启动 HTTP 服务器
+    // 11. 注册基于JSON配置的API路由（支持热加载）
+    console.log('📝 注册JSON配置API路由...');
+    await registerAutoRoutes(fastify, API_CONFIG_PATH);
+
+    // 初始化路由重载器
+    routeReloader.initialize(fastify, API_CONFIG_PATH);
+
+    // 12. 启动 HTTP 服务器
     await fastify.listen({ port: PORT, host: HOST });
 
     console.log('');
