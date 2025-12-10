@@ -1,0 +1,14 @@
+[
+  {
+    "id": "SYSTEM_USER_MGMT",
+    "name": "系统用户管理",
+    "description": "系统用户管理相关API",
+    "order": 1
+  },
+  {
+    "id": "yTMWJ8W3",
+    "name": "示例分组",
+    "description": "示例分组",
+    "order": 2
+  }
+]

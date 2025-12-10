@@ -520,6 +520,26 @@
       background: #e68900;
     }
 
+    .btn-success {
+      background: #4caf50;
+      color: #fff;
+      border: 1px solid #43a047;
+    }
+
+    .btn-success:hover {
+      background: #43a047;
+    }
+
+    .btn-info {
+      background: #2196f3;
+      color: #fff;
+      border: 1px solid #1976d2;
+    }
+
+    .btn-info:hover {
+      background: #1976d2;
+    }
+
     .btn-sm {
       padding: 5px 10px;
       font-size: 12px;
@@ -753,7 +773,11 @@
       <button class="btn btn-secondary" onclick="manageGroups()">分组</button>
       <button class="btn btn-secondary" onclick="refreshData()">刷新</button>
       <button class="btn btn-warning" onclick="reloadConfig()" title="重新加载API配置，无需重启服务">🔄 热加载</button>
+      <button class="btn btn-success" onclick="exportAllAPIs()" title="导出全部API配置">📤 导出</button>
+      <button class="btn btn-info" onclick="showImportDialog()" title="导入API配置">📥 导入</button>
     </div>
+    <!-- 隐藏的文件输入 -->
+    <input type="file" id="importFileInput" accept=".json" style="display:none" onchange="handleImportFile(event)">
   </div>
 
   <!-- 主体容器 -->
@@ -2126,6 +2150,80 @@
         console.error('热加载失败:', error);
         showNotification('❌ 热加载失败: ' + error.message, 'error');
       }
+    }
+
+    // 导出全部API配置
+    async function exportAllAPIs() {
+      try {
+        const response = await fetch(`${API_BASE}/admin/export`);
+        const result = await response.json();
+
+        if (result.success) {
+          // 生成文件名
+          const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+          const filename = `api_export_${timestamp}.json`;
+
+          // 创建下载
+          const blob = new Blob([JSON.stringify(result.data, null, 2)], { type: 'application/json' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = filename;
+          a.click();
+          URL.revokeObjectURL(url);
+
+          showNotification(`✅ 导出成功: ${result.data.apis.length} 个API`, 'success');
+        } else {
+          showNotification('❌ 导出失败: ' + result.message, 'error');
+        }
+      } catch (error) {
+        console.error('导出失败:', error);
+        showNotification('❌ 导出失败: ' + error.message, 'error');
+      }
+    }
+
+    // 显示导入对话框
+    function showImportDialog() {
+      document.getElementById('importFileInput').click();
+    }
+
+    // 处理导入文件
+    async function handleImportFile(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      try {
+        const text = await file.text();
+        const data = JSON.parse(text);
+
+        // 确认导入
+        const apiCount = data.apis ? data.apis.length : 0;
+        const groupCount = data.groups ? data.groups.length : 0;
+        const overwrite = confirm(`即将导入 ${apiCount} 个API 和 ${groupCount} 个分组。\n\n是否覆盖已存在的API？\n\n点击"确定"覆盖，点击"取消"跳过已存在的。`);
+
+        // 发送导入请求
+        const response = await fetch(`${API_BASE}/admin/import`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ data, overwrite })
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          showNotification('✅ ' + result.message, 'success');
+          // 刷新数据
+          await refreshData();
+        } else {
+          showNotification('❌ 导入失败: ' + result.message, 'error');
+        }
+      } catch (error) {
+        console.error('导入失败:', error);
+        showNotification('❌ 导入失败: ' + error.message, 'error');
+      }
+
+      // 重置文件输入
+      event.target.value = '';
     }
 
     // 生成随机ID

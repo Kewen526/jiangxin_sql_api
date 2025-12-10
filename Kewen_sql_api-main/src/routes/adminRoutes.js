@@ -852,6 +852,195 @@ export function registerAdminRoutes(fastify) {
   console.log('  ✓ PUT    /admin/apis/:apiId/sql/:sqlId                      更新SQL');
   console.log('  ✓ DELETE /admin/apis/:apiId/sql/:sqlId                      删除SQL');
   console.log('  ✓ POST   /admin/test-execute                                临时测试执行SQL');
+  // 导出全部API配置
+  fastify.get('/admin/export', {
+    schema: {
+      summary: '导出全部API配置',
+      tags: ['Admin']
+    },
+    handler: async (request, reply) => {
+      try {
+        const apis = await configManager.getAllApis();
+        const groups = await configManager.getGroups();
+
+        // 返回完整的导出数据
+        return {
+          success: true,
+          exportTime: new Date().toISOString(),
+          data: {
+            groups: groups,
+            apis: apis.map(api => ({
+              id: api.id,
+              name: api.name,
+              path: api.path,
+              note: api.note,
+              contentType: api.contentType,
+              groupId: api.groupId,
+              params: api.paramsParsed,
+              datasourceId: api.datasourceId,
+              transaction: api.transaction,
+              sqlList: api.sqlList,
+              status: api.status
+            }))
+          }
+        };
+      } catch (error) {
+        return reply.code(500).send({
+          success: false,
+          message: '导出失败: ' + error.message
+        });
+      }
+    }
+  });
+
+  // 按分组导出API配置
+  fastify.get('/admin/export/:groupId', {
+    schema: {
+      summary: '按分组导出API配置',
+      tags: ['Admin']
+    },
+    handler: async (request, reply) => {
+      try {
+        const { groupId } = request.params;
+        const apis = await configManager.getAllApis();
+        const groups = await configManager.getGroups();
+
+        // 筛选指定分组的API
+        const filteredApis = apis.filter(api => api.groupId === groupId);
+        const group = groups.find(g => g.id === groupId);
+
+        return {
+          success: true,
+          exportTime: new Date().toISOString(),
+          data: {
+            groups: group ? [group] : [],
+            apis: filteredApis.map(api => ({
+              id: api.id,
+              name: api.name,
+              path: api.path,
+              note: api.note,
+              contentType: api.contentType,
+              groupId: api.groupId,
+              params: api.paramsParsed,
+              datasourceId: api.datasourceId,
+              transaction: api.transaction,
+              sqlList: api.sqlList,
+              status: api.status
+            }))
+          }
+        };
+      } catch (error) {
+        return reply.code(500).send({
+          success: false,
+          message: '导出失败: ' + error.message
+        });
+      }
+    }
+  });
+
+  // 导入API配置
+  fastify.post('/admin/import', {
+    schema: {
+      summary: '导入API配置',
+      tags: ['Admin'],
+      body: {
+        type: 'object',
+        required: ['data'],
+        properties: {
+          data: { type: 'object' },
+          overwrite: { type: 'boolean', default: false }
+        }
+      }
+    },
+    handler: async (request, reply) => {
+      try {
+        const { data, overwrite = false } = request.body;
+        const results = { created: 0, updated: 0, skipped: 0, errors: [] };
+
+        // 导入分组
+        if (data.groups && Array.isArray(data.groups)) {
+          const existingGroups = await configManager.getGroups();
+          for (const group of data.groups) {
+            const exists = existingGroups.find(g => g.id === group.id);
+            if (!exists) {
+              try {
+                await configManager.addGroup(group);
+              } catch (e) {
+                results.errors.push(`分组 ${group.name}: ${e.message}`);
+              }
+            }
+          }
+        }
+
+        // 导入API
+        if (data.apis && Array.isArray(data.apis)) {
+          const existingApis = await configManager.getAllApis();
+
+          for (const api of data.apis) {
+            const exists = existingApis.find(a => a.path === api.path);
+
+            if (exists) {
+              if (overwrite) {
+                try {
+                  await configManager.updateApi(exists.id, {
+                    name: api.name,
+                    note: api.note,
+                    contentType: api.contentType,
+                    groupId: api.groupId,
+                    params: api.params,
+                    datasourceId: api.datasourceId,
+                    transaction: api.transaction,
+                    sqlList: api.sqlList
+                  });
+                  results.updated++;
+                } catch (e) {
+                  results.errors.push(`更新 ${api.path}: ${e.message}`);
+                }
+              } else {
+                results.skipped++;
+              }
+            } else {
+              try {
+                await configManager.createApi({
+                  name: api.name,
+                  path: api.path,
+                  note: api.note,
+                  contentType: api.contentType,
+                  groupId: api.groupId,
+                  params: api.params,
+                  datasourceId: api.datasourceId,
+                  transaction: api.transaction,
+                  sqlList: api.sqlList
+                });
+                results.created++;
+              } catch (e) {
+                results.errors.push(`创建 ${api.path}: ${e.message}`);
+              }
+            }
+          }
+        }
+
+        // 触发热加载
+        try {
+          await routeReloader.reload();
+        } catch (e) {
+          console.error('热加载失败:', e);
+        }
+
+        return {
+          success: true,
+          message: `导入完成: 创建 ${results.created} 个, 更新 ${results.updated} 个, 跳过 ${results.skipped} 个`,
+          results
+        };
+      } catch (error) {
+        return reply.code(500).send({
+          success: false,
+          message: '导入失败: ' + error.message
+        });
+      }
+    }
+  });
+
   console.log('  ✓ POST   /admin/apis/:id/test-execute                       测试执行API');
   console.log('  ✓ GET    /admin/groups                                      获取分组');
   console.log('  ✓ GET    /admin/datasources                                 获取数据源列表');
@@ -861,4 +1050,7 @@ export function registerAdminRoutes(fastify) {
   console.log('  ✓ DELETE /admin/datasources/:id                             删除数据源');
   console.log('  ✓ POST   /admin/datasources/test                            测试数据源连接');
   console.log('  ✓ POST   /admin/restart                                     重启服务器');
+  console.log('  ✓ GET    /admin/export                                      导出全部API');
+  console.log('  ✓ GET    /admin/export/:groupId                             按分组导出API');
+  console.log('  ✓ POST   /admin/import                                      导入API配置');
 }
