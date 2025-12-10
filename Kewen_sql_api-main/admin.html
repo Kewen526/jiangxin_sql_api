@@ -742,6 +742,55 @@
       color: var(--text-secondary);
       font-size: 14px;
     }
+
+    /* ===== 代码语言切换按钮样式 ===== */
+    .code-lang-btn {
+      transition: all 0.2s;
+    }
+
+    .code-lang-btn.active {
+      background: var(--accent-blue) !important;
+      color: white !important;
+      border-color: var(--accent-blue) !important;
+    }
+
+    /* ===== 通知提示样式 ===== */
+    .notification {
+      position: fixed;
+      top: 60px;
+      right: 20px;
+      padding: 12px 20px;
+      border-radius: 4px;
+      color: white;
+      font-size: 14px;
+      z-index: 10000;
+      animation: slideIn 0.3s ease-out;
+      max-width: 400px;
+      box-shadow: var(--shadow);
+    }
+
+    .notification.success {
+      background: var(--accent-success);
+    }
+
+    .notification.error {
+      background: var(--accent-danger);
+    }
+
+    .notification.info {
+      background: var(--accent-blue);
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
   </style>
 </head>
 <body>
@@ -821,7 +870,10 @@
 
         <div class="detail-header">
           <h2 class="detail-title" id="detailTitle">API名称</h2>
-          <p class="detail-path" id="detailPath">/api/path</p>
+          <p class="detail-path">
+            <span id="detailPath">/api/path</span>
+            <button class="btn btn-sm btn-secondary" onclick="copyApiUrl()" title="复制完整URL" style="margin-left: 10px; padding: 2px 8px; font-size: 11px;">📋 复制</button>
+          </p>
         </div>
 
         <div class="detail-tabs">
@@ -909,9 +961,21 @@
           <div class="tab-pane" id="tab-test">
             <div class="form-group">
               <label class="form-label">测试参数（JSON格式）</label>
-              <textarea class="form-textarea" id="apiTestParams" placeholder='{"id": "1", "name": "test"}' style="min-height: 150px;"></textarea>
+              <textarea class="form-textarea" id="apiTestParams" placeholder='{"id": "1", "name": "test"}' style="min-height: 150px;" oninput="generateCodeExamples()"></textarea>
             </div>
             <button class="btn btn-primary" onclick="testExecuteApi()">▶️ 执行测试</button>
+
+            <!-- 请求示例代码 -->
+            <div class="form-group" style="margin-top: 20px;">
+              <label class="form-label">请求示例代码</label>
+              <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                <button class="btn btn-sm btn-secondary code-lang-btn active" onclick="switchCodeLang('python')" data-lang="python">Python</button>
+                <button class="btn btn-sm btn-secondary code-lang-btn" onclick="switchCodeLang('curl')" data-lang="curl">cURL</button>
+                <button class="btn btn-sm btn-secondary code-lang-btn" onclick="switchCodeLang('javascript')" data-lang="javascript">JavaScript</button>
+                <button class="btn btn-sm btn-secondary" onclick="copyCodeExample()" style="margin-left: auto;">📋 复制代码</button>
+              </div>
+              <div class="code-block" id="codeExample" style="white-space: pre; font-size: 12px;"></div>
+            </div>
 
             <div class="result-container" id="testResultContainer">
               <div class="form-group" style="margin-top: 20px;">
@@ -1070,6 +1134,7 @@
     let currentAPI = null;
     let currentSqlTabs = [];
     let activeSqlTabIndex = 0;
+    let currentCodeLang = 'python'; // 当前选择的代码语言
 
     // 页面加载时初始化
     window.addEventListener('DOMContentLoaded', async () => {
@@ -1300,7 +1365,8 @@
         // 填充表单
         document.getElementById('apiId').value = currentAPI.id;
         document.getElementById('detailTitle').textContent = currentAPI.name;
-        document.getElementById('detailPath').textContent = currentAPI.path;
+        // 显示完整的API URL（包含域名前缀）
+        document.getElementById('detailPath').textContent = API_BASE + currentAPI.path;
         document.getElementById('apiName').value = currentAPI.name || '';
         document.getElementById('apiPath').value = currentAPI.path || '';
         document.getElementById('apiNote').value = currentAPI.note || '';
@@ -1336,6 +1402,9 @@
 
         // 隐藏测试结果
         document.getElementById('testResultContainer').classList.remove('active');
+
+        // 生成请求示例代码
+        generateCodeExamples();
 
       } catch (error) {
         alert('加载 API 失败: ' + error.message);
@@ -2260,6 +2329,244 @@
         closeGroupModal();
       }
     });
+
+    // ========== 请求示例代码生成功能 ==========
+
+    // 复制完整的API URL
+    function copyApiUrl() {
+      const apiPath = document.getElementById('apiPath').value || '';
+      const fullUrl = API_BASE + apiPath;
+
+      navigator.clipboard.writeText(fullUrl).then(() => {
+        showNotification('✅ URL已复制到剪贴板', 'success');
+      }).catch(() => {
+        // 降级方案
+        const textArea = document.createElement('textarea');
+        textArea.value = fullUrl;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        showNotification('✅ URL已复制到剪贴板', 'success');
+      });
+    }
+
+    // 切换代码语言
+    function switchCodeLang(lang) {
+      currentCodeLang = lang;
+
+      // 更新按钮状态
+      document.querySelectorAll('.code-lang-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.dataset.lang === lang) {
+          btn.classList.add('active');
+        }
+      });
+
+      // 重新生成代码
+      generateCodeExamples();
+    }
+
+    // 生成请求示例代码
+    function generateCodeExamples() {
+      const apiPath = document.getElementById('apiPath').value || '';
+      const testParamsText = document.getElementById('apiTestParams').value || '';
+      const paramsText = document.getElementById('apiParams').value || '';
+      const contentType = document.getElementById('apiContentType').value || 'application/json';
+
+      // 解析参数
+      let params = {};
+      if (testParamsText.trim()) {
+        try {
+          params = JSON.parse(testParamsText);
+        } catch (e) {
+          // 如果测试参数JSON无效，尝试从参数定义生成示例
+        }
+      }
+
+      // 如果没有测试参数，从参数定义生成示例值
+      if (Object.keys(params).length === 0 && paramsText.trim()) {
+        paramsText.split('\n').forEach(line => {
+          const parts = line.split(':').map(s => s.trim());
+          if (parts[0]) {
+            const name = parts[0];
+            const type = parts[1] || 'string';
+            // 生成示例值
+            if (type === 'number') {
+              params[name] = 1;
+            } else if (type === 'boolean') {
+              params[name] = true;
+            } else {
+              params[name] = `示例${name}`;
+            }
+          }
+        });
+      }
+
+      const fullUrl = API_BASE + apiPath;
+      const hasParams = Object.keys(params).length > 0;
+
+      // 确定HTTP方法
+      const method = hasParams || contentType === 'application/json' ? 'POST' : 'GET';
+
+      let code = '';
+
+      switch (currentCodeLang) {
+        case 'python':
+          code = generatePythonCode(fullUrl, method, params, contentType, hasParams);
+          break;
+        case 'curl':
+          code = generateCurlCode(fullUrl, method, params, contentType, hasParams);
+          break;
+        case 'javascript':
+          code = generateJavaScriptCode(fullUrl, method, params, contentType, hasParams);
+          break;
+      }
+
+      document.getElementById('codeExample').textContent = code;
+    }
+
+    // 生成Python代码
+    function generatePythonCode(url, method, params, contentType, hasParams) {
+      if (method === 'GET' && !hasParams) {
+        return `import requests
+
+requestUrl = '${url}'
+
+response = requests.get(requestUrl)
+print(response.status_code)
+print(response.text)`;
+      }
+
+      if (contentType === 'application/x-www-form-urlencoded') {
+        return `import requests
+from urllib import parse
+
+requestUrl = '${url}'
+headers = {
+    'Content-Type': 'application/x-www-form-urlencoded'
+}
+formData = ${JSON.stringify(params, null, 4)}
+data = parse.urlencode(formData, True)
+
+response = requests.post(requestUrl, headers=headers, data=data)
+print(response.status_code)
+print(response.text)`;
+      }
+
+      return `import requests
+import json
+
+requestUrl = '${url}'
+headers = {
+    'Content-Type': 'application/json'
+}
+jsonParam = ${JSON.stringify(params, null, 4)}
+data = json.dumps(jsonParam)
+
+response = requests.post(requestUrl, headers=headers, data=data)
+print(response.status_code)
+print(response.text)`;
+    }
+
+    // 生成cURL代码
+    function generateCurlCode(url, method, params, contentType, hasParams) {
+      if (method === 'GET' && !hasParams) {
+        return `curl '${url}'`;
+      }
+
+      const dataStr = JSON.stringify(params);
+
+      if (contentType === 'application/x-www-form-urlencoded') {
+        const formData = Object.entries(params)
+          .map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`)
+          .join('&');
+        return `curl '${url}' \\
+  -H 'Content-Type: application/x-www-form-urlencoded' \\
+  --data-raw '${formData}'`;
+      }
+
+      return `curl '${url}' \\
+  -H 'Content-Type: application/json' \\
+  --data-raw '${dataStr}'`;
+    }
+
+    // 生成JavaScript代码
+    function generateJavaScriptCode(url, method, params, contentType, hasParams) {
+      if (method === 'GET' && !hasParams) {
+        return `// 使用 fetch API
+fetch('${url}')
+  .then(response => response.json())
+  .then(data => console.log(data))
+  .catch(error => console.error('Error:', error));`;
+      }
+
+      if (contentType === 'application/x-www-form-urlencoded') {
+        return `// 使用 fetch API
+const formData = new URLSearchParams(${JSON.stringify(params, null, 2)});
+
+fetch('${url}', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/x-www-form-urlencoded'
+  },
+  body: formData
+})
+  .then(response => response.json())
+  .then(data => console.log(data))
+  .catch(error => console.error('Error:', error));`;
+      }
+
+      return `// 使用 fetch API
+fetch('${url}', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify(${JSON.stringify(params, null, 2)})
+})
+  .then(response => response.json())
+  .then(data => console.log(data))
+  .catch(error => console.error('Error:', error));`;
+    }
+
+    // 复制代码示例
+    function copyCodeExample() {
+      const code = document.getElementById('codeExample').textContent;
+
+      navigator.clipboard.writeText(code).then(() => {
+        showNotification('✅ 代码已复制到剪贴板', 'success');
+      }).catch(() => {
+        // 降级方案
+        const textArea = document.createElement('textarea');
+        textArea.value = code;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        showNotification('✅ 代码已复制到剪贴板', 'success');
+      });
+    }
+
+    // 显示通知
+    function showNotification(message, type = 'info') {
+      // 移除已存在的通知
+      const existingNotification = document.querySelector('.notification');
+      if (existingNotification) {
+        existingNotification.remove();
+      }
+
+      // 创建新通知
+      const notification = document.createElement('div');
+      notification.className = `notification ${type}`;
+      notification.textContent = message;
+      document.body.appendChild(notification);
+
+      // 3秒后自动移除
+      setTimeout(() => {
+        notification.remove();
+      }, 3000);
+    }
   </script>
 </body>
 </html>

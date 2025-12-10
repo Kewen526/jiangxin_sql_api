@@ -170,6 +170,23 @@ class DatabasePoolManager {
   }
 
   /**
+   * 获取所有可用的数据源ID列表
+   * @returns {Array<string>} 数据源ID列表
+   */
+  getAvailableDatasourceIds() {
+    return Array.from(this.pools.keys());
+  }
+
+  /**
+   * 检查数据源是否存在
+   * @param {string} datasourceId - 数据源ID
+   * @returns {boolean} 是否存在
+   */
+  hasDatasource(datasourceId) {
+    return this.pools.has(datasourceId);
+  }
+
+  /**
    * 动态添加新的数据源连接池
    * @param {Object} dsConfig - 数据源配置
    * @returns {boolean} 是否添加成功

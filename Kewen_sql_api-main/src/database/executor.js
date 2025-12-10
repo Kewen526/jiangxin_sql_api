@@ -7,6 +7,28 @@ import poolManager from './pool.js';
 import { parseSql } from './queryParser.js';
 
 /**
+ * 验证数据源是否存在
+ * @param {string} datasourceId - 数据源ID
+ * @returns {boolean} 是否存在
+ */
+export function validateDatasource(datasourceId) {
+  try {
+    poolManager.getPool(datasourceId);
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
+
+/**
+ * 获取所有可用的数据源ID列表
+ * @returns {Array<string>} 数据源ID列表
+ */
+export function getAvailableDatasources() {
+  return poolManager.getAvailableDatasourceIds();
+}
+
+/**
  * 执行API任务
  */
 export async function executeApiTask(taskConfig, requestParams) {
@@ -17,6 +39,19 @@ export async function executeApiTask(taskConfig, requestParams) {
 
   for (const task of tasks) {
     const { datasourceId, sqlList, transaction } = task;
+
+    // 验证数据源是否存在（提供更友好的错误信息）
+    if (!validateDatasource(datasourceId)) {
+      const availableDs = getAvailableDatasources();
+      throw new Error(
+        `数据源 "${datasourceId}" 不存在或未初始化。\n` +
+        `当前可用的数据源: [${availableDs.join(', ') || '无'}]\n` +
+        `请检查：\n` +
+        `1. 数据源配置是否正确\n` +
+        `2. 数据库连接是否正常\n` +
+        `3. 服务是否需要重启以加载新数据源`
+      );
+    }
 
     if (transaction === 1) {
       // 事务执行
