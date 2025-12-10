@@ -61,13 +61,14 @@ export function clearConfigCache() {
 async function findApiByPath(configPath, requestPath) {
   const config = await loadApiConfig(configPath);
 
-  // 移除开头的斜杠进行匹配
-  const normalizedPath = requestPath.startsWith('/') ? requestPath.substring(1) : requestPath;
+  // 标准化请求路径（确保以/开头）
+  const normalizedRequestPath = requestPath.startsWith('/') ? requestPath : '/' + requestPath;
 
   // 查找匹配的API
   const api = config.api.find(a => {
-    const apiPath = a.path.startsWith('/') ? a.path.substring(1) : a.path;
-    return apiPath === normalizedPath && a.status === 1;
+    // 标准化配置中的路径
+    const apiPath = a.path.startsWith('/') ? a.path : '/' + a.path;
+    return apiPath === normalizedRequestPath && a.status === 1;
   });
 
   return api;
@@ -105,22 +106,25 @@ function determineHttpMethod(apiParams, contentType) {
  * 注册动态路由处理器
  */
 export async function registerAutoRoutes(fastify, configPath) {
-  // 注册一个通配符路由来捕获所有API请求
-  fastify.all('/:apiPath', {
+  // 注册通配符路由来捕获所有 /api/* 请求
+  fastify.all('/api/*', {
     schema: {
       summary: '动态API路由处理器',
       description: '根据配置动态执行API请求',
       tags: ['API']
     },
     handler: async (request, reply) => {
-      const requestPath = request.params.apiPath;
+      // 获取完整路径，包括 /api/ 前缀
+      const requestPath = request.url.split('?')[0]; // 移除查询参数
 
-      // 排除系统路由和管理路由（这些由其他路由处理）
-      if (requestPath.startsWith('admin') || requestPath === 'health') {
+      // 排除管理路由
+      if (requestPath.startsWith('/api/apis') || requestPath.startsWith('/api/groups') ||
+          requestPath.startsWith('/api/datasources') || requestPath.startsWith('/api/logs') ||
+          requestPath.startsWith('/api/auth')) {
         return reply.code(404).send({
           success: false,
           error: 'NotFound',
-          message: `路径 "/${requestPath}" 不存在`
+          message: `路径 "${requestPath}" 不存在`
         });
       }
 
